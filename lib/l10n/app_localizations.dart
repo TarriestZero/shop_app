@@ -100,6 +100,114 @@ abstract class AppLocalizations {
   /// **'Каталог'**
   String get catalogTitle;
 
+  /// No description provided for @catalogLoading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузка каталога'**
+  String get catalogLoading;
+
+  /// No description provided for @catalogEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'В каталоге пока нет товаров'**
+  String get catalogEmpty;
+
+  /// No description provided for @catalogLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить каталог'**
+  String get catalogLoadFailed;
+
+  /// No description provided for @catalogRefreshFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить каталог'**
+  String get catalogRefreshFailed;
+
+  /// No description provided for @noConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет соединения'**
+  String get noConnection;
+
+  /// No description provided for @catalogNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь к интернету, чтобы загрузить каталог.'**
+  String get catalogNeedsConnection;
+
+  /// No description provided for @retry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get retry;
+
+  /// No description provided for @requestTimedOut.
+  ///
+  /// In ru, this message translates to:
+  /// **'Истекло время ожидания ответа. Попробуйте ещё раз.'**
+  String get requestTimedOut;
+
+  /// No description provided for @authenticationRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Необходимо войти в аккаунт'**
+  String get authenticationRequired;
+
+  /// No description provided for @accessDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ запрещён'**
+  String get accessDenied;
+
+  /// No description provided for @resourceNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрашиваемые данные не найдены'**
+  String get resourceNotFound;
+
+  /// No description provided for @serverError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ошибка сервера. Попробуйте позже.'**
+  String get serverError;
+
+  /// No description provided for @tooManyRequests.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много запросов. Попробуйте позже.'**
+  String get tooManyRequests;
+
+  /// No description provided for @invalidServerResponse.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обработать данные сервера'**
+  String get invalidServerResponse;
+
+  /// No description provided for @requestCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрос отменён'**
+  String get requestCancelled;
+
+  /// No description provided for @secureConnectionFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось установить защищённое соединение'**
+  String get secureConnectionFailed;
+
+  /// No description provided for @storageWriteFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось сохранить данные на устройстве'**
+  String get storageWriteFailed;
+
+  /// No description provided for @validationFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте введённые данные и попробуйте ещё раз.'**
+  String get validationFailed;
+
   /// No description provided for @cartTitle.
   ///
   /// In ru, this message translates to:
