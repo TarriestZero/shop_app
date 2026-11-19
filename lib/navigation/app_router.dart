@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shop_app/navigation/app_paths.dart';
-import 'package:shop_app/src/features/cart/presentation/cart/screen/cart_screen.dart';
-import 'package:shop_app/src/features/catalog/presentation/catalog/screen/catalog_screen.dart';
-import 'package:shop_app/src/features/catalog/presentation/product_details/screen/product_details_screen.dart';
-import 'package:shop_app/src/features/checkout/presentation/checkout/screen/checkout_screen.dart';
-import 'package:shop_app/src/features/checkout/presentation/order_confirmation/screen/order_confirmation_screen.dart';
+import 'package:shop_app/features/cart/presentation/cart/screen/cart_screen.dart';
+import 'package:shop_app/features/catalog/presentation/catalog/screen/catalog_screen.dart';
+import 'package:shop_app/features/catalog/presentation/product_details/screen/product_details_screen.dart';
+import 'package:shop_app/features/checkout/presentation/checkout/screen/checkout_screen.dart';
+import 'package:shop_app/features/checkout/presentation/order_confirmation/screen/order_confirmation_screen.dart';
 
 part 'app_router.gr.dart';
 
