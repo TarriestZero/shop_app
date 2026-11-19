@@ -11,7 +11,7 @@ part 'app_router.gr.dart';
 
 @AutoRouterConfig(
   replaceInRouteName: 'Screen,Route',
-  generateForDir: ['lib/src/features'],
+  generateForDir: ['lib/features'],
 )
 class AppRouter extends RootStackRouter {
   @override
