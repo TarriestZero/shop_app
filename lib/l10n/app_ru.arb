@@ -1,0 +1,24 @@
+{
+  "@@locale": "ru",
+  "catalogTitle": "Каталог",
+  "cartTitle": "Корзина",
+  "emptyCart": "Корзина пуста",
+  "checkoutTitle": "Оформление заказа",
+  "productTitle": "Товар {productId}",
+  "@productTitle": {
+    "placeholders": {
+      "productId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTitle": "Заказ {orderId}",
+  "@orderTitle": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderConfirmationUnavailable": "Подтверждение заказа недоступно"
+}
