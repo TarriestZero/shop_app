@@ -165,6 +165,35 @@ class AppLocalizationsRu extends AppLocalizations {
   String get checkoutTitle => 'Оформление заказа';
 
   @override
+  String get productDetailsTitle => 'О товаре';
+
+  @override
+  String get productLoading => 'Загрузка товара';
+
+  @override
+  String get productLoadFailed => 'Не удалось загрузить товар';
+
+  @override
+  String get productRefreshFailed => 'Не удалось обновить данные товара';
+
+  @override
+  String get productUnavailable => 'Товар недоступен';
+
+  @override
+  String get productUnavailableDescription =>
+      'Этого товара нет в текущем каталоге.';
+
+  @override
+  String get productNeedsConnection =>
+      'Подключитесь к интернету, чтобы загрузить данные товара.';
+
+  @override
+  String get productDescription => 'Описание';
+
+  @override
+  String get productNoDescription => 'Описание пока не добавлено';
+
+  @override
   String productTitle(String productId) {
     return 'Товар $productId';
   }

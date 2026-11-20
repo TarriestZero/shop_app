@@ -143,6 +143,9 @@ Future<CartNotifierBloc> _pumpApp(
 
 class _CatalogRepository extends Fake implements CatalogRepository {
   @override
+  Stream<List<CatalogProduct>> get changes => const Stream.empty();
+
+  @override
   Future<List<CatalogProduct>?> getCachedCatalog() async => null;
 
   @override

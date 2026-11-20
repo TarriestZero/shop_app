@@ -370,6 +370,60 @@ abstract class AppLocalizations {
   /// **'Оформление заказа'**
   String get checkoutTitle;
 
+  /// No description provided for @productDetailsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'О товаре'**
+  String get productDetailsTitle;
+
+  /// No description provided for @productLoading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузка товара'**
+  String get productLoading;
+
+  /// No description provided for @productLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить товар'**
+  String get productLoadFailed;
+
+  /// No description provided for @productRefreshFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить данные товара'**
+  String get productRefreshFailed;
+
+  /// No description provided for @productUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Товар недоступен'**
+  String get productUnavailable;
+
+  /// No description provided for @productUnavailableDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этого товара нет в текущем каталоге.'**
+  String get productUnavailableDescription;
+
+  /// No description provided for @productNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь к интернету, чтобы загрузить данные товара.'**
+  String get productNeedsConnection;
+
+  /// No description provided for @productDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание'**
+  String get productDescription;
+
+  /// No description provided for @productNoDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание пока не добавлено'**
+  String get productNoDescription;
+
   /// No description provided for @productTitle.
   ///
   /// In ru, this message translates to:

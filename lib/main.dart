@@ -30,6 +30,7 @@ void main() {
                 context.read<SharedPreferencesService>(),
               ),
             ),
+            dispose: (repository) => repository.close(),
           ),
           RepositoryProvider(
             create: (context) => CartRepository(

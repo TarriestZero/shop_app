@@ -223,6 +223,9 @@ void main() {
 NetworkException _connectionError() => const NetworkException.noConnection();
 
 class _Repository extends Fake implements CatalogRepository {
+  @override
+  Stream<List<CatalogProduct>> get changes => const Stream.empty();
+
   List<CatalogProduct>? cached;
   Future<List<CatalogProduct>> Function() fetch = () async => [_fresh];
   int requests = 0;

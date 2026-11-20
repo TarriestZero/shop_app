@@ -58,6 +58,15 @@
   "cartTotal": "Итого",
   "cartCheckout": "К оформлению",
   "checkoutTitle": "Оформление заказа",
+  "productDetailsTitle": "О товаре",
+  "productLoading": "Загрузка товара",
+  "productLoadFailed": "Не удалось загрузить товар",
+  "productRefreshFailed": "Не удалось обновить данные товара",
+  "productUnavailable": "Товар недоступен",
+  "productUnavailableDescription": "Этого товара нет в текущем каталоге.",
+  "productNeedsConnection": "Подключитесь к интернету, чтобы загрузить данные товара.",
+  "productDescription": "Описание",
+  "productNoDescription": "Описание пока не добавлено",
   "productTitle": "Товар {productId}",
   "@productTitle": {
     "placeholders": {

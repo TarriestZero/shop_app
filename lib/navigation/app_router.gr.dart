@@ -216,7 +216,9 @@ class ProductDetailsRoute extends PageRouteInfo<ProductDetailsRouteArgs> {
           productId: pathParams.getString('productId'),
         ),
       );
-      return ProductDetailsScreen(key: args.key, productId: args.productId);
+      return WrappedRoute(
+        child: ProductDetailsScreen(key: args.key, productId: args.productId),
+      );
     },
   );
 }

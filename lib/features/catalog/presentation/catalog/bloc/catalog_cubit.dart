@@ -21,9 +21,15 @@ abstract interface class CatalogActions {
 }
 
 class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
-  CatalogCubit(this._repository) : super(const CatalogInitial());
+  CatalogCubit(this._repository) : super(const CatalogInitial()) {
+    _subscription = _repository.changes.listen((products) {
+      if (!isClosed) _setProducts(products);
+    });
+  }
 
   final CatalogRepository _repository;
+  late final StreamSubscription<List<CatalogProduct>> _subscription;
+  List<CatalogProduct>? _lastSnapshot;
   Future<void>? _pendingLoad;
   Timer? _retryTimer;
   Duration _retryDelay = const Duration(seconds: 2);
@@ -142,7 +148,10 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
   }
 
   void _setProducts(List<CatalogProduct> products) {
-    _filtersRepository.updateProducts(products);
+    if (!identical(products, _lastSnapshot)) {
+      _lastSnapshot = products;
+      _filtersRepository.updateProducts(products);
+    }
     _emitFiltered();
   }
 
@@ -180,6 +189,7 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
   Future<void> close() async {
     _retryTimer?.cancel();
     final closing = super.close();
+    await _subscription.cancel();
     await _filtersRepository.close();
     await closing;
   }

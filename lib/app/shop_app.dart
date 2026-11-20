@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:shop_app/features/cart/presentation/widgets/cart_feedback_listener.dart';
 import 'package:shop_app/foundation/foundation.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
 import 'package:shop_app/navigation/app_router.dart';
@@ -44,6 +45,8 @@ class _ShopAppState extends State<ShopApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       theme: createAppLightTheme(),
       routerConfig: _routerConfig,
+      builder: (context, child) =>
+          CartFeedbackListener(child: child ?? const SizedBox.shrink()),
     );
   }
 }
