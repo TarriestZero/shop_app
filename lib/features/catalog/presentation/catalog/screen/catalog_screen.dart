@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/core/exceptions/user_error_message.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
+import 'package:shop_app/features/catalog/domain/entity/catalog_filters.dart';
 import 'package:shop_app/features/catalog/presentation/catalog/bloc/catalog_cubit.dart';
 import 'package:shop_app/features/catalog/presentation/catalog/widgets/catalog_product_card.dart';
 import 'package:shop_app/foundation/foundation.dart';
@@ -51,10 +52,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
       appBar: AppBar(
         title: Text(strings.catalogTitle),
         actions: [
-          IconButton(
-            tooltip: strings.cartTitle,
-            onPressed: context.read<CatalogCubit>().openCart,
-            icon: const Icon(Icons.shopping_cart_outlined),
+          BlocBuilder<CatalogCubit, CatalogState>(
+            buildWhen: (previous, current) =>
+                current is! CatalogFiltersSelected &&
+                current is! CatalogProductSelected,
+            builder: (context, state) => IconButton(
+              tooltip: strings.filtersTitle,
+              onPressed: state is CatalogLoaded
+                  ? context.read<CatalogCubit>().openFilters
+                  : null,
+              icon: Badge(
+                isLabelVisible:
+                    state is CatalogLoaded && !state.filters.isEmpty,
+                backgroundColor: context.colors.primary,
+                child: const Icon(Icons.tune),
+              ),
+            ),
           ),
         ],
       ),
@@ -63,16 +76,24 @@ class _CatalogScreenState extends State<CatalogScreen> {
         child: BlocConsumer<CatalogCubit, CatalogState>(
           listenWhen: (previous, current) =>
               current is CatalogProductSelected ||
-              current is CatalogCartSelected ||
+              current is CatalogFiltersSelected ||
               current is CatalogRefreshFailure && !current.isOffline,
-          listener: (context, state) {
+          listener: (context, state) async {
             switch (state) {
               case CatalogProductSelected():
                 context.router.push(
                   ProductDetailsRoute(productId: state.productId.toString()),
                 );
-              case CatalogCartSelected():
-                context.tabsRouter.navigate(const CartRoute());
+              case CatalogFiltersSelected():
+                final filters = await context.router.push<CatalogFilters>(
+                  CatalogFiltersRoute(
+                    repository: state.repository,
+                    filters: state.filters,
+                  ),
+                );
+                if (context.mounted && filters != null) {
+                  context.read<CatalogCubit>().applyFilters(filters);
+                }
               case CatalogRefreshFailure():
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -91,7 +112,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           },
           buildWhen: (previous, current) =>
               current is! CatalogProductSelected &&
-              current is! CatalogCartSelected,
+              current is! CatalogFiltersSelected,
           builder: (context, state) {
             if (state is CatalogLoaded) return _CatalogContent(state: state);
             if (state is CatalogLoadFailure) {
@@ -157,7 +178,11 @@ class _CatalogContent extends StatelessWidget {
           child: RefreshIndicator(
             onRefresh: context.read<CatalogCubit>().refresh,
             child: state.products.isEmpty
-                ? _CatalogStatus(title: strings.catalogEmpty)
+                ? _CatalogStatus(
+                    title: state.totalCount == 0
+                        ? strings.catalogEmpty
+                        : strings.catalogNoFilterResults,
+                  )
                 : GridView.builder(
                     padding: const EdgeInsets.all(16),
                     physics: const AlwaysScrollableScrollPhysics(),

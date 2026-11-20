@@ -124,6 +124,72 @@ abstract class AppLocalizations {
   /// **'Не удалось обновить каталог'**
   String get catalogRefreshFailed;
 
+  /// No description provided for @catalogNoFilterResults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет товаров с такими фильтрами'**
+  String get catalogNoFilterResults;
+
+  /// No description provided for @filtersTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фильтры'**
+  String get filtersTitle;
+
+  /// No description provided for @filtersReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить'**
+  String get filtersReset;
+
+  /// No description provided for @filtersApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать'**
+  String get filtersApply;
+
+  /// No description provided for @filtersCounting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подсчёт результатов'**
+  String get filtersCounting;
+
+  /// No description provided for @filtersCountFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось подсчитать результаты. Попробуйте ещё раз.'**
+  String get filtersCountFailed;
+
+  /// No description provided for @filtersShowResults.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать: {count}'**
+  String filtersShowResults(int count);
+
+  /// No description provided for @filtersCategories.
+  ///
+  /// In ru, this message translates to:
+  /// **'Категории'**
+  String get filtersCategories;
+
+  /// No description provided for @filtersNoCategories.
+  ///
+  /// In ru, this message translates to:
+  /// **'Категорий пока нет'**
+  String get filtersNoCategories;
+
+  /// No description provided for @filtersPrice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цена'**
+  String get filtersPrice;
+
+  /// No description provided for @filtersPriceRange.
+  ///
+  /// In ru, this message translates to:
+  /// **'От {minimum} до {maximum}'**
+  String filtersPriceRange(String minimum, String maximum);
+
   /// No description provided for @noConnection.
   ///
   /// In ru, this message translates to:

@@ -27,6 +27,70 @@ class CartRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [CatalogFiltersScreen]
+class CatalogFiltersRoute extends PageRouteInfo<CatalogFiltersRouteArgs> {
+  CatalogFiltersRoute({
+    Key? key,
+    required CatalogFiltersRepository repository,
+    required CatalogFilters filters,
+    List<PageRouteInfo>? children,
+  }) : super(
+         CatalogFiltersRoute.name,
+         args: CatalogFiltersRouteArgs(
+           key: key,
+           repository: repository,
+           filters: filters,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'CatalogFiltersRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<CatalogFiltersRouteArgs>();
+      return CatalogFiltersScreen(
+        key: args.key,
+        repository: args.repository,
+        filters: args.filters,
+      );
+    },
+  );
+}
+
+class CatalogFiltersRouteArgs {
+  const CatalogFiltersRouteArgs({
+    this.key,
+    required this.repository,
+    required this.filters,
+  });
+
+  final Key? key;
+
+  final CatalogFiltersRepository repository;
+
+  final CatalogFilters filters;
+
+  @override
+  String toString() {
+    return 'CatalogFiltersRouteArgs{key: $key, repository: $repository, filters: $filters}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! CatalogFiltersRouteArgs) return false;
+    return key == other.key &&
+        repository == other.repository &&
+        filters == other.filters;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ repository.hashCode ^ filters.hashCode;
+}
+
+/// generated route for
 /// [CatalogScreen]
 class CatalogRoute extends PageRouteInfo<void> {
   const CatalogRoute({List<PageRouteInfo>? children})

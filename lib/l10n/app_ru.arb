@@ -5,6 +5,26 @@
   "catalogEmpty": "В каталоге пока нет товаров",
   "catalogLoadFailed": "Не удалось загрузить каталог",
   "catalogRefreshFailed": "Не удалось обновить каталог",
+  "catalogNoFilterResults": "Нет товаров с такими фильтрами",
+  "filtersTitle": "Фильтры",
+  "filtersReset": "Сбросить",
+  "filtersApply": "Показать",
+  "filtersCounting": "Подсчёт результатов",
+  "filtersCountFailed": "Не удалось подсчитать результаты. Попробуйте ещё раз.",
+  "filtersShowResults": "Показать: {count}",
+  "@filtersShowResults": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "filtersCategories": "Категории",
+  "filtersNoCategories": "Категорий пока нет",
+  "filtersPrice": "Цена",
+  "filtersPriceRange": "От {minimum} до {maximum}",
+  "@filtersPriceRange": {
+    "placeholders": {
+      "minimum": {"type": "String"},
+      "maximum": {"type": "String"}
+    }
+  },
   "noConnection": "Нет соединения",
   "catalogNeedsConnection": "Подключитесь к интернету, чтобы загрузить каталог.",
   "retry": "Повторить",

@@ -4,6 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shop_app/core/exceptions/index.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
+import 'package:shop_app/features/catalog/domain/entity/catalog_filters.dart';
 import 'package:shop_app/features/catalog/domain/entity/catalog_product.dart';
 import 'package:shop_app/features/catalog/presentation/catalog/bloc/catalog_cubit.dart';
 
@@ -165,6 +166,57 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     expect(repository.requests, 2);
     expect(cubit.state, CatalogLoaded([_fresh]));
+  });
+
+  test('Every filter uses the full snapshot and opening filters passes all products', () async {
+    repository.fetch = () async => [_cached, _fresh];
+    final cubit = CatalogCubit(repository);
+    addTearDown(cubit.close);
+    await cubit.load();
+    cubit.applyFilters(CatalogFilters(maximumPriceInCents: 1500));
+    expect((cubit.state as CatalogLoaded).products, [_cached]);
+
+    final navigation = cubit.stream.first;
+    cubit.openFilters();
+    final selected = await navigation as CatalogFiltersSelected;
+    expect(selected.repository.products, [_cached, _fresh]);
+    expect(selected.filters.maximumPriceInCents, 1500);
+
+    cubit.applyFilters(CatalogFilters(minimumPriceInCents: 2000));
+    expect((cubit.state as CatalogLoaded).products, [_fresh]);
+    cubit.applyFilters(const CatalogFilters.empty());
+    expect((cubit.state as CatalogLoaded).products, [_cached, _fresh]);
+    expect(repository.requests, 1);
+  });
+
+  test('Filters survive refresh, zero results and offline failures', () async {
+    repository.fetch = () async => [_cached, _fresh];
+    final cubit = CatalogCubit(repository);
+    addTearDown(cubit.close);
+    await cubit.load();
+
+    final pending = Completer<List<CatalogProduct>>();
+    repository.fetch = () => pending.future;
+    final refresh = cubit.refresh();
+    final filters = CatalogFilters(minimumPriceInCents: 2000);
+    cubit.applyFilters(filters);
+    expect(cubit.state, isA<CatalogRefreshing>());
+    expect((cubit.state as CatalogLoaded).products, [_fresh]);
+
+    pending.complete([_cached]);
+    await refresh;
+    var state = cubit.state as CatalogLoaded;
+    expect(state.filters, filters);
+    expect(state.products, isEmpty);
+    expect(state.totalCount, 1);
+    expect(state, isNot(isA<CatalogEmpty>()));
+
+    repository.fetch = () => Future.error(_connectionError());
+    await cubit.refresh();
+    cubit.applyFilters(const CatalogFilters.empty());
+    state = cubit.state as CatalogLoaded;
+    expect(state.products, [_cached]);
+    expect(state.isOffline, isTrue);
   });
 }
 

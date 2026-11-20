@@ -25,6 +25,44 @@ class AppLocalizationsRu extends AppLocalizations {
   String get catalogRefreshFailed => 'Не удалось обновить каталог';
 
   @override
+  String get catalogNoFilterResults => 'Нет товаров с такими фильтрами';
+
+  @override
+  String get filtersTitle => 'Фильтры';
+
+  @override
+  String get filtersReset => 'Сбросить';
+
+  @override
+  String get filtersApply => 'Показать';
+
+  @override
+  String get filtersCounting => 'Подсчёт результатов';
+
+  @override
+  String get filtersCountFailed =>
+      'Не удалось подсчитать результаты. Попробуйте ещё раз.';
+
+  @override
+  String filtersShowResults(int count) {
+    return 'Показать: $count';
+  }
+
+  @override
+  String get filtersCategories => 'Категории';
+
+  @override
+  String get filtersNoCategories => 'Категорий пока нет';
+
+  @override
+  String get filtersPrice => 'Цена';
+
+  @override
+  String filtersPriceRange(String minimum, String maximum) {
+    return 'От $minimum до $maximum';
+  }
+
+  @override
   String get noConnection => 'Нет соединения';
 
   @override

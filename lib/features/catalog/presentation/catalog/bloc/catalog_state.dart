@@ -24,8 +24,14 @@ final class CatalogProductSelected extends CatalogState {
   List<Object?> get props => [productId];
 }
 
-final class CatalogCartSelected extends CatalogState {
-  const CatalogCartSelected();
+final class CatalogFiltersSelected extends CatalogState {
+  const CatalogFiltersSelected(this.repository, this.filters);
+
+  final CatalogFiltersRepository repository;
+  final CatalogFilters filters;
+
+  @override
+  List<Object?> get props => [repository, filters];
 }
 
 final class CatalogLoadFailure extends CatalogState {
@@ -43,33 +49,55 @@ final class CatalogLoadFailure extends CatalogState {
 }
 
 sealed class CatalogData extends CatalogState {
-  CatalogData(List<CatalogProduct> products, {this.isOffline = false})
-    : products = List.unmodifiable(products);
+  CatalogData(
+    List<CatalogProduct> products, {
+    this.isOffline = false,
+    this.filters = const CatalogFilters.empty(),
+    int? totalCount,
+  }) : products = List.unmodifiable(products),
+       totalCount = totalCount ?? products.length;
 
   final List<CatalogProduct> products;
   final bool isOffline;
+  final CatalogFilters filters;
+  final int totalCount;
 
   @override
-  List<Object?> get props => [products, isOffline];
+  List<Object?> get props => [products, isOffline, filters, totalCount];
 }
 
 final class CatalogLoaded extends CatalogData {
-  CatalogLoaded(super.products, {super.isOffline});
+  CatalogLoaded(
+    super.products, {
+    super.isOffline,
+    super.filters,
+    super.totalCount,
+  });
 }
 
 final class CatalogEmpty extends CatalogLoaded {
-  CatalogEmpty() : super(const []);
+  CatalogEmpty({super.filters, super.isOffline}) : super(const []);
 }
 
 final class CatalogRefreshing extends CatalogLoaded {
-  CatalogRefreshing(super.products, {super.isOffline});
+  CatalogRefreshing(
+    super.products, {
+    super.isOffline,
+    super.filters,
+    super.totalCount,
+  });
 }
 
 final class CatalogRefreshFailure extends CatalogLoaded {
-  CatalogRefreshFailure(super.products, {required this.exception})
-    : super(
-        isOffline: exception is NetworkException && exception.isConnectionError,
-      );
+  CatalogRefreshFailure(
+    super.products, {
+    required this.exception,
+    super.filters,
+    super.totalCount,
+  }) : super(
+         isOffline:
+             exception is NetworkException && exception.isConnectionError,
+       );
 
   final AppException exception;
 
