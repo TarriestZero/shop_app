@@ -10,6 +10,8 @@ import 'package:shop_app/app/shop_app.dart';
 import 'package:shop_app/core/storage/shared_preferences_service.dart';
 import 'package:shop_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:shop_app/features/cart/data/repositories/cart_repository.dart';
+import 'package:shop_app/features/cart/data/local/cart_local_data_source.dart';
+import 'package:shop_app/features/cart/di/cart_notifier_bloc.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
 import 'package:shop_app/features/catalog/data/local/catalog_local_data_source.dart';
 import 'package:shop_app/features/users/data/repositories/users_repository.dart';
@@ -30,8 +32,12 @@ void main() {
             ),
           ),
           RepositoryProvider(
-            create: (context) =>
-                CartRepository(CartsApiSource(context.read<Dio>())),
+            create: (context) => CartRepository(
+              CartsApiSource(context.read<Dio>()),
+              storage: CartLocalDataSource(
+                context.read<SharedPreferencesService>(),
+              ),
+            ),
           ),
           RepositoryProvider(
             create: (context) =>
@@ -42,7 +48,13 @@ void main() {
                 AuthRepository(AuthApiSource(context.read<Dio>())),
           ),
         ],
-        child: const ShopApp(),
+        child: BlocProvider(
+          lazy: false,
+          create: (context) =>
+              CartNotifierBloc(context.read<CartRepository>())
+                ..add(const CartStarted()),
+          child: const ShopApp(),
+        ),
       ),
     ),
   );

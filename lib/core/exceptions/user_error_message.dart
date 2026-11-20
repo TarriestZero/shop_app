@@ -23,7 +23,11 @@ String userErrorMessage(
       NetworkErrorType.custom => fallback,
     };
   }
-  if (error is StorageException) return strings.storageWriteFailed;
+  if (error is StorageException) {
+    return error.type == StorageErrorType.read
+        ? strings.storageReadFailed
+        : strings.storageWriteFailed;
+  }
   if (error is ValidationException) return strings.validationFailed;
   return fallback;
 }

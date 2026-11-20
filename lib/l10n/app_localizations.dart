@@ -268,6 +268,12 @@ abstract class AppLocalizations {
   /// **'Не удалось сохранить данные на устройстве'**
   String get storageWriteFailed;
 
+  /// No description provided for @storageReadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось прочитать сохранённые данные. Попробуйте ещё раз.'**
+  String get storageReadFailed;
+
   /// No description provided for @validationFailed.
   ///
   /// In ru, this message translates to:
@@ -285,6 +291,78 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Корзина пуста'**
   String get emptyCart;
+
+  /// No description provided for @cartLoading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузка корзины'**
+  String get cartLoading;
+
+  /// No description provided for @cartLoadFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось восстановить корзину'**
+  String get cartLoadFailed;
+
+  /// No description provided for @cartUpdateFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось изменить корзину. Попробуйте ещё раз.'**
+  String get cartUpdateFailed;
+
+  /// No description provided for @cartAddProduct.
+  ///
+  /// In ru, this message translates to:
+  /// **'В корзину'**
+  String get cartAddProduct;
+
+  /// No description provided for @cartRemoveProduct.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить товар целиком'**
+  String get cartRemoveProduct;
+
+  /// No description provided for @cartDecreaseQuantity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уменьшить количество'**
+  String get cartDecreaseQuantity;
+
+  /// No description provided for @cartIncreaseQuantity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Увеличить количество'**
+  String get cartIncreaseQuantity;
+
+  /// No description provided for @cartQuantity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Количество: {count}'**
+  String cartQuantity(int count);
+
+  /// No description provided for @cartArticle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Артикул: {productId}'**
+  String cartArticle(int productId);
+
+  /// No description provided for @cartUnitPrice.
+  ///
+  /// In ru, this message translates to:
+  /// **'{price} / шт.'**
+  String cartUnitPrice(String price);
+
+  /// No description provided for @cartTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Итого'**
+  String get cartTotal;
+
+  /// No description provided for @cartCheckout.
+  ///
+  /// In ru, this message translates to:
+  /// **'К оформлению'**
+  String get cartCheckout;
 
   /// No description provided for @checkoutTitle.
   ///

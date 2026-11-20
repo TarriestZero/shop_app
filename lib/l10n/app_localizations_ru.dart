@@ -105,6 +105,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get storageWriteFailed => 'Не удалось сохранить данные на устройстве';
 
   @override
+  String get storageReadFailed =>
+      'Не удалось прочитать сохранённые данные. Попробуйте ещё раз.';
+
+  @override
   String get validationFailed =>
       'Проверьте введённые данные и попробуйте ещё раз.';
 
@@ -113,6 +117,49 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get emptyCart => 'Корзина пуста';
+
+  @override
+  String get cartLoading => 'Загрузка корзины';
+
+  @override
+  String get cartLoadFailed => 'Не удалось восстановить корзину';
+
+  @override
+  String get cartUpdateFailed =>
+      'Не удалось изменить корзину. Попробуйте ещё раз.';
+
+  @override
+  String get cartAddProduct => 'В корзину';
+
+  @override
+  String get cartRemoveProduct => 'Удалить товар целиком';
+
+  @override
+  String get cartDecreaseQuantity => 'Уменьшить количество';
+
+  @override
+  String get cartIncreaseQuantity => 'Увеличить количество';
+
+  @override
+  String cartQuantity(int count) {
+    return 'Количество: $count';
+  }
+
+  @override
+  String cartArticle(int productId) {
+    return 'Артикул: $productId';
+  }
+
+  @override
+  String cartUnitPrice(String price) {
+    return '$price / шт.';
+  }
+
+  @override
+  String get cartTotal => 'Итого';
+
+  @override
+  String get cartCheckout => 'К оформлению';
 
   @override
   String get checkoutTitle => 'Оформление заказа';

@@ -1,8 +1,11 @@
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:shop_app/features/cart/domain/entity/cart_item.dart';
+import 'package:shop_app/features/cart/presentation/widgets/cart_product_action.dart';
 import 'package:shop_app/features/catalog/domain/entity/catalog_product.dart';
 import 'package:shop_app/foundation/foundation.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
+import 'package:shop_app/ui_kit/ui_kit.dart';
 
 /// Прямоугольная карточка товара для сетки каталога.
 class CatalogProductCard extends StatelessWidget {
@@ -23,10 +26,6 @@ class CatalogProductCard extends StatelessWidget {
       locale: AppLocalizations.of(context)!.localeName,
       name: 'USD',
     ).format(product.priceInCents / 100);
-    final placeholder = Center(
-      child: Icon(Icons.image_outlined, size: 40, color: colors.border),
-    );
-    final imageUrl = product.imageUrl;
     final category = product.category.trim();
 
     return Semantics(
@@ -46,17 +45,7 @@ class CatalogProductCard extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: imageUrl == null || imageUrl.isEmpty
-                      ? placeholder
-                      : Image.network(
-                          imageUrl,
-                          fit: BoxFit.contain,
-                          excludeFromSemantics: true,
-                          loadingBuilder: (context, child, progress) =>
-                              progress == null ? child : placeholder,
-                          errorBuilder: (context, error, stackTrace) =>
-                              placeholder,
-                        ),
+                  child: AppProductImage(imageUrl: product.imageUrl),
                 ),
               ),
               Padding(
@@ -91,6 +80,20 @@ class CatalogProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: text.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: CartProductAction(
+                        item: CartItem(
+                          productId: product.id,
+                          title: product.title,
+                          priceInCents: product.priceInCents,
+                          quantity: 1,
+                          category: product.category,
+                          imageUrl: product.imageUrl,
+                        ),
                       ),
                     ),
                   ],
