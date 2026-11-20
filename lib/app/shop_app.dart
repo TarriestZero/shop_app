@@ -23,6 +23,7 @@ class _ShopAppState extends State<ShopApp> {
       routeInformationProvider: config.routeInformationProvider,
       routeInformationParser: config.routeInformationParser,
       routerDelegate: config.routerDelegate,
+      backButtonDispatcher: config.backButtonDispatcher,
     );
   }
 

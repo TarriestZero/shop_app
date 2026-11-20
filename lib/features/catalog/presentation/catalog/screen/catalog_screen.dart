@@ -72,7 +72,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   ProductDetailsRoute(productId: state.productId.toString()),
                 );
               case CatalogCartSelected():
-                context.router.push(const CartRoute());
+                context.tabsRouter.navigate(const CartRoute());
               case CatalogRefreshFailure():
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

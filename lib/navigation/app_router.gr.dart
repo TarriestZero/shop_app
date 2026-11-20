@@ -37,7 +37,7 @@ class CatalogRoute extends PageRouteInfo<void> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const CatalogScreen();
+      return WrappedRoute(child: const CatalogScreen());
     },
   );
 }
@@ -54,6 +54,22 @@ class CheckoutRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const CheckoutScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [MainScreen]
+class MainRoute extends PageRouteInfo<void> {
+  const MainRoute({List<PageRouteInfo>? children})
+    : super(MainRoute.name, initialChildren: children);
+
+  static const String name = 'MainRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MainScreen();
     },
   );
 }
