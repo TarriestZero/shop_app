@@ -35,17 +35,20 @@ final class CatalogFiltersSelected extends CatalogState {
 }
 
 final class CatalogLoadFailure extends CatalogState {
-  const CatalogLoadFailure(this.exception);
+  const CatalogLoadFailure(this.exception, {this._isOffline});
 
   final AppException exception;
+  final bool? _isOffline;
 
   bool get isOffline {
     final error = exception;
-    return error is NetworkException && error.isConnectionError;
+    return _isOffline ??
+        (error is NetworkException &&
+            error.type == NetworkErrorType.noConnection);
   }
 
   @override
-  List<Object?> get props => [exception];
+  List<Object?> get props => [exception, isOffline];
 }
 
 sealed class CatalogData extends CatalogState {
@@ -92,11 +95,14 @@ final class CatalogRefreshFailure extends CatalogLoaded {
   CatalogRefreshFailure(
     super.products, {
     required this.exception,
+    bool? isOffline,
     super.filters,
     super.totalCount,
   }) : super(
          isOffline:
-             exception is NetworkException && exception.isConnectionError,
+             isOffline ??
+             (exception is NetworkException &&
+                 exception.type == NetworkErrorType.noConnection),
        );
 
   final AppException exception;

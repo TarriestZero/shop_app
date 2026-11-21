@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/core/exceptions/user_error_message.dart';
+import 'package:shop_app/core/exceptions/network_exception.dart';
+import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
 import 'package:shop_app/features/catalog/domain/entity/catalog_filters.dart';
 import 'package:shop_app/features/catalog/presentation/catalog/bloc/catalog_cubit.dart';
@@ -17,8 +19,10 @@ class CatalogScreen extends StatefulWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) => BlocProvider(
-    create: (context) =>
-        CatalogCubit(context.read<CatalogRepository>())..load(),
+    create: (context) => CatalogCubit(
+      context.read<CatalogRepository>(),
+      connectionChanges: context.read<NetworkConnectionService>().watch(),
+    )..load(),
     child: this,
   );
 
@@ -75,10 +79,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
       body: SafeArea(
         top: false,
         child: BlocConsumer<CatalogCubit, CatalogState>(
-          listenWhen: (previous, current) =>
-              current is CatalogProductSelected ||
-              current is CatalogFiltersSelected ||
-              current is CatalogRefreshFailure && !current.isOffline,
+          listenWhen: (previous, current) => switch (current) {
+            CatalogProductSelected() || CatalogFiltersSelected() => true,
+            CatalogRefreshFailure(
+              exception: NetworkException(type: NetworkErrorType.noConnection),
+            ) =>
+              false,
+            CatalogRefreshFailure() => true,
+            _ => false,
+          },
           listener: (context, state) async {
             switch (state) {
               case CatalogProductSelected():
@@ -119,13 +128,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
             if (state is CatalogLoadFailure) {
               final offline = state.isOffline;
               return _CatalogStatus(
-                title: offline
-                    ? strings.noConnection
-                    : userErrorMessage(
-                        state.exception,
-                        strings,
-                        fallback: strings.catalogLoadFailed,
-                      ),
+                title: userErrorMessage(
+                  state.exception,
+                  strings,
+                  fallback: strings.catalogLoadFailed,
+                ),
                 description: offline ? strings.catalogNeedsConnection : null,
                 onRetry: context.read<CatalogCubit>().refresh,
               );

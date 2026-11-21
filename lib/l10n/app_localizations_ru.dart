@@ -119,6 +119,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get emptyCart => 'Корзина пуста';
 
   @override
+  String get goToCatalog => 'Перейти в каталог';
+
+  @override
   String get cartLoading => 'Загрузка корзины';
 
   @override
@@ -230,6 +233,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get productNoDescription => 'Описание пока не добавлено';
+
+  @override
+  String get productNoRating => 'Пока нет оценок';
+
+  @override
+  String productRating(String rating, int count) {
+    return 'Рейтинг: $rating из 5 · Оценок: $count';
+  }
 
   @override
   String productTitle(String productId) {

@@ -20,5 +20,7 @@ CatalogProduct catalogProductFromDto(ProductDto dto) {
     category: dto.category ?? '',
     description: dto.description ?? '',
     imageUrl: dto.image,
+    rating: dto.rating?.rate,
+    ratingCount: dto.rating?.count,
   );
 }

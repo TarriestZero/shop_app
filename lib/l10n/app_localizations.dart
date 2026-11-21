@@ -292,6 +292,12 @@ abstract class AppLocalizations {
   /// **'Корзина пуста'**
   String get emptyCart;
 
+  /// No description provided for @goToCatalog.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перейти в каталог'**
+  String get goToCatalog;
+
   /// No description provided for @cartLoading.
   ///
   /// In ru, this message translates to:
@@ -495,6 +501,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Описание пока не добавлено'**
   String get productNoDescription;
+
+  /// No description provided for @productNoRating.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет оценок'**
+  String get productNoRating;
+
+  /// No description provided for @productRating.
+  ///
+  /// In ru, this message translates to:
+  /// **'Рейтинг: {rating} из 5 · Оценок: {count}'**
+  String productRating(String rating, int count);
 
   /// No description provided for @productTitle.
   ///

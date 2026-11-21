@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/features/catalog/presentation/product_details/bloc/product_details_cubit.dart';
 import 'package:shop_app/foundation/foundation.dart';
@@ -76,6 +77,27 @@ class ProductDetailsContent extends StatelessWidget {
                 Text(
                   strings.cartArticle(product.id),
                   style: text.bodySmall?.copyWith(color: colors.textSecondary),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(Icons.star_rounded, color: colors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        product.rating == null
+                            ? strings.productNoRating
+                            : strings.productRating(
+                                NumberFormat(
+                                  '0.#',
+                                  strings.localeName,
+                                ).format(product.rating),
+                                product.ratingCount ?? 0,
+                              ),
+                        style: text.bodyMedium,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 Text(strings.productDescription, style: text.titleLarge),

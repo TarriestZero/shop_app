@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/app/shop_app.dart';
+import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:shop_app/features/cart/di/cart_notifier_bloc.dart';
 import 'package:shop_app/features/cart/presentation/cart/widgets/cart_item_card.dart';
 import 'package:shop_app/features/cart/presentation/widgets/cart_product_action.dart';
@@ -10,8 +11,26 @@ import 'package:shop_app/features/catalog/domain/entity/catalog_product.dart';
 import 'package:shop_app/ui_kit/ui_kit.dart';
 
 import '../../support/cart_test_support.dart';
+import '../../support/network_test_support.dart';
 
 void main() {
+  testWidgets('Кнопка пустой корзины открывает вкладку каталога', (
+    tester,
+  ) async {
+    await _pumpApp(tester, MemoryCartPreferences());
+    await _openCart(tester);
+    expect(find.text('Корзина пуста'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Перейти в каталог'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CartProductAction), findsOneWidget);
+    expect(
+      tester
+          .widget<AppNavigationBar>(find.byType(AppNavigationBar))
+          .selectedIndex,
+      0,
+    );
+  });
+
   testWidgets('Catalog, cart and tab counter share the same notifier', (
     tester,
   ) async {
@@ -132,8 +151,15 @@ Future<CartNotifierBloc> _pumpApp(
     await bloc.close();
   });
   await tester.pumpWidget(
-    RepositoryProvider<CatalogRepository>.value(
-      value: _CatalogRepository(),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<CatalogRepository>.value(
+          value: _CatalogRepository(),
+        ),
+        RepositoryProvider<NetworkConnectionService>.value(
+          value: TestNetworkConnectionService(),
+        ),
+      ],
       child: BlocProvider.value(value: bloc, child: const ShopApp()),
     ),
   );

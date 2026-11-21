@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/features/cart/di/cart_notifier_bloc.dart';
 import 'package:shop_app/features/cart/presentation/widgets/cart_feedback_listener.dart';
@@ -17,6 +18,7 @@ import 'package:shop_app/ui_kit/ui_kit.dart';
 
 import '../../support/cart_test_support.dart';
 import '../../support/catalog_test_support.dart';
+import '../../support/network_test_support.dart';
 
 void main() {
   testWidgets('Редактирование поля не показывает ошибки нетронутых полей', (
@@ -272,8 +274,13 @@ _pumpCheckout(
     await tester.binding.setSurfaceSize(null);
   });
   await tester.pumpWidget(
-    RepositoryProvider<CatalogRepository>.value(
-      value: repository,
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<CatalogRepository>.value(value: repository),
+        RepositoryProvider<NetworkConnectionService>.value(
+          value: TestNetworkConnectionService(),
+        ),
+      ],
       child: BlocProvider.value(
         value: cart,
         child: MaterialApp.router(

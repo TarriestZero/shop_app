@@ -30,7 +30,8 @@ final class ProductDetailsLoadFailure extends ProductDetailsState {
 
   bool get isOffline {
     final error = exception;
-    return error is NetworkException && error.isConnectionError;
+    return error is NetworkException &&
+        error.type == NetworkErrorType.noConnection;
   }
 
   @override
@@ -54,7 +55,9 @@ final class ProductDetailsRefreshing extends ProductDetailsLoaded {
 final class ProductDetailsRefreshFailure extends ProductDetailsLoaded {
   ProductDetailsRefreshFailure(super.product, this.exception)
     : super(
-        isOffline: exception is NetworkException && exception.isConnectionError,
+        isOffline:
+            exception is NetworkException &&
+            exception.type == NetworkErrorType.noConnection,
       );
 
   final AppException exception;

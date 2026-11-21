@@ -9,6 +9,8 @@ class CatalogProduct extends Equatable {
     required this.category,
     required this.description,
     this.imageUrl,
+    this.rating,
+    this.ratingCount,
   });
 
   final int id;
@@ -17,6 +19,8 @@ class CatalogProduct extends Equatable {
   final String category;
   final String description;
   final String? imageUrl;
+  final double? rating;
+  final int? ratingCount;
 
   @override
   List<Object?> get props => [
@@ -26,5 +30,7 @@ class CatalogProduct extends Equatable {
     category,
     description,
     imageUrl,
+    rating,
+    ratingCount,
   ];
 }

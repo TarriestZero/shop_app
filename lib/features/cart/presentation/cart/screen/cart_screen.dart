@@ -59,7 +59,23 @@ class CartScreen extends StatelessWidget {
               );
             }
             if (state.items.isEmpty) {
-              return Center(child: Text(strings.emptyCart));
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(strings.emptyCart),
+                      const SizedBox(height: 16),
+                      AppButton(
+                        label: strings.goToCatalog,
+                        onPressed: () =>
+                            context.router.navigate(const CatalogRoute()),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
             final formatter = NumberFormat.simpleCurrency(

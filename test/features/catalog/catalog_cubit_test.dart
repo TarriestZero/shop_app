@@ -28,6 +28,113 @@ void main() {
 
   setUp(() => repository = _Repository());
 
+  test('Потеря сети после успеха сохраняет фильтры, восстановление обновляет каталог', () async {
+    final connections = StreamController<bool>();
+    repository.fetch = () async => [_cached, _fresh];
+    final cubit = CatalogCubit(
+      repository,
+      connectionChanges: connections.stream,
+    );
+    await cubit.load();
+    final filters = CatalogFilters(minimumPriceInCents: 2000);
+    cubit.applyFilters(filters);
+    connections.add(false);
+    await Future<void>.delayed(Duration.zero);
+    var state = cubit.state as CatalogLoaded;
+    expect(state.isOffline, isTrue);
+    expect(state.products, [_fresh]);
+    expect(state.filters, filters);
+
+    repository.fetch = () async => [_cached];
+    connections.add(true);
+    connections.add(true);
+    await Future<void>.delayed(Duration.zero);
+    state = cubit.state as CatalogLoaded;
+    expect(repository.requests, 2);
+    expect(state.isOffline, isFalse);
+    expect(state.filters, filters);
+    expect(state.products, isEmpty);
+    expect(state.totalCount, 1);
+    await cubit.close();
+    expect(connections.hasListener, isFalse);
+    await connections.close();
+  });
+
+  test(
+    'Восстановление во время запроса выполняет обновление после старой ошибки',
+    () async {
+      final connections = StreamController<bool>();
+      final cubit = CatalogCubit(
+        repository,
+        connectionChanges: connections.stream,
+      );
+      addTearDown(() async {
+        await cubit.close();
+        await connections.close();
+      });
+      await cubit.load();
+      final pending = Completer<List<CatalogProduct>>();
+      repository.fetch = () => pending.future;
+      final refresh = cubit.refresh();
+      connections.add(false);
+      connections.add(true);
+      await Future<void>.delayed(Duration.zero);
+      repository.fetch = () async => [_cached];
+      pending.completeError(_connectionError());
+      await refresh;
+      await Future<void>.delayed(Duration.zero);
+      expect(repository.requests, 3);
+      expect(cubit.state, CatalogLoaded([_cached]));
+    },
+  );
+
+  test(
+    'Поздний успешный ответ не скрывает потерю подключения во время запроса',
+    () async {
+      final connections = StreamController<bool>();
+      final cubit = CatalogCubit(
+        repository,
+        connectionChanges: connections.stream,
+      );
+      addTearDown(() async {
+        await cubit.close();
+        await connections.close();
+      });
+      await cubit.load();
+      final pending = Completer<List<CatalogProduct>>();
+      repository.fetch = () => pending.future;
+      final refresh = cubit.refresh();
+      connections.add(false);
+      await Future<void>.delayed(Duration.zero);
+      pending.complete([_cached]);
+      await refresh;
+      expect((cubit.state as CatalogLoaded).products, [_cached]);
+      expect((cubit.state as CatalogLoaded).isOffline, isTrue);
+    },
+  );
+
+  test('Восстановление сети в фоне ждёт возврата в приложение', () async {
+    final connections = StreamController<bool>();
+    final cubit = CatalogCubit(
+      repository,
+      connectionChanges: connections.stream,
+    );
+    addTearDown(() async {
+      await cubit.close();
+      await connections.close();
+    });
+    await cubit.load();
+    cubit.setActive(false);
+    connections.add(false);
+    connections.add(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.requests, 1);
+    cubit.setActive(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.requests, 2);
+    expect((cubit.state as CatalogLoaded).isOffline, isFalse);
+  });
+
   blocTest<CatalogCubit, CatalogState>(
     'Shows cached data during refresh and replaces it on success',
     build: () {

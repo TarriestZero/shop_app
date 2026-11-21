@@ -42,6 +42,7 @@
   "validationFailed": "Проверьте введённые данные и попробуйте ещё раз.",
   "cartTitle": "Корзина",
   "emptyCart": "Корзина пуста",
+  "goToCatalog": "Перейти в каталог",
   "cartLoading": "Загрузка корзины",
   "cartLoadFailed": "Не удалось восстановить корзину",
   "cartUpdateFailed": "Не удалось изменить корзину. Попробуйте ещё раз.",
@@ -80,6 +81,14 @@
   "productNeedsConnection": "Подключитесь к интернету, чтобы загрузить данные товара.",
   "productDescription": "Описание",
   "productNoDescription": "Описание пока не добавлено",
+  "productNoRating": "Пока нет оценок",
+  "productRating": "Рейтинг: {rating} из 5 · Оценок: {count}",
+  "@productRating": {
+    "placeholders": {
+      "rating": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
   "productTitle": "Товар {productId}",
   "@productTitle": {
     "placeholders": {

@@ -21,14 +21,24 @@ abstract interface class CatalogActions {
 }
 
 class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
-  CatalogCubit(this._repository) : super(const CatalogInitial()) {
+  CatalogCubit(this._repository, {Stream<bool>? connectionChanges})
+    : super(const CatalogInitial()) {
     _subscription = _repository.changes.listen((products) {
       if (!isClosed) _setProducts(products);
     });
+    _connectionSubscription = connectionChanges?.listen(
+      _onConnectionChanged,
+      // При недоступном наблюдении за интерфейсами остаются HTTP и автоповторы.
+      onError: (Object _) {},
+    );
   }
 
   final CatalogRepository _repository;
   late final StreamSubscription<List<CatalogProduct>> _subscription;
+  late final StreamSubscription<bool>? _connectionSubscription;
+  bool? _hasConnection;
+  int _connectionVersion = 0;
+  bool _refreshOnReconnect = false;
   List<CatalogProduct>? _lastSnapshot;
   Future<void>? _pendingLoad;
   Timer? _retryTimer;
@@ -82,6 +92,7 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
         CatalogRefreshFailure(
           products,
           exception: current.exception,
+          isOffline: current.isOffline,
           filters: filters,
           totalCount: _allProducts.length,
         ),
@@ -98,6 +109,10 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
     _retryTimer?.cancel();
     return _pendingLoad = _load(readCache: readCache).whenComplete(() {
       _pendingLoad = null;
+      if (_refreshOnReconnect && _active && !isClosed) {
+        _refreshOnReconnect = false;
+        unawaited(refresh());
+      }
     });
   }
 
@@ -122,8 +137,12 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
             : const CatalogLoading(),
       );
 
+      final connectionVersion = _connectionVersion;
       final products = await _repository.loadCatalog();
       if (isClosed) return;
+      // Успешный HTTP-ответ уточняет устаревший статус после возврата в приложение.
+      // Событие потери сети, пришедшее во время запроса, сохраняет приоритет.
+      if (connectionVersion == _connectionVersion) _hasConnection = true;
       _retryDelay = const Duration(seconds: 2);
       _setProducts(products);
     } on AppException catch (error) {
@@ -134,12 +153,18 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
           CatalogRefreshFailure(
             current.products,
             exception: error,
+            isOffline: _hasConnection == false || _isNoConnection(error),
             filters: current.filters,
             totalCount: current.totalCount,
           ),
         );
       } else {
-        emit(CatalogLoadFailure(error));
+        emit(
+          CatalogLoadFailure(
+            error,
+            isOffline: _hasConnection == false || _isNoConnection(error),
+          ),
+        );
       }
       if (error is NetworkException && error.isConnectionError) {
         _scheduleRetry();
@@ -155,18 +180,55 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
     _emitFiltered();
   }
 
-  void _emitFiltered({bool isOffline = false}) {
+  void _emitFiltered({bool? isOffline}) {
+    final offline = isOffline ?? _hasConnection == false;
     emit(
       _allProducts.isEmpty
-          ? CatalogEmpty(filters: _filters, isOffline: isOffline)
+          ? CatalogEmpty(filters: _filters, isOffline: offline)
           : CatalogLoaded(
               _filtersRepository.filter(_filters),
-              isOffline: isOffline,
+              isOffline: offline,
               filters: _filters,
               totalCount: _allProducts.length,
             ),
     );
   }
+
+  void _onConnectionChanged(bool connected) {
+    if (isClosed || _hasConnection == connected) return;
+    final previous = _hasConnection;
+    _hasConnection = connected;
+    _connectionVersion++;
+    if (!connected) {
+      _refreshOnReconnect = false;
+      _retryTimer?.cancel();
+      final current = state;
+      if (current is CatalogLoaded) {
+        emit(
+          CatalogRefreshFailure(
+            current.products,
+            exception: const NetworkException.noConnection(),
+            filters: current.filters,
+            totalCount: current.totalCount,
+          ),
+        );
+      } else if (current is CatalogLoadFailure) {
+        emit(const CatalogLoadFailure(NetworkException.noConnection()));
+      }
+    } else if (_active && previous == false) {
+      _retryDelay = const Duration(seconds: 2);
+      _retryTimer?.cancel();
+      if (_pendingLoad != null) {
+        // Запрос, начатый до восстановления сети, может завершиться старой ошибкой.
+        _refreshOnReconnect = true;
+      } else {
+        unawaited(refresh());
+      }
+    }
+  }
+
+  static bool _isNoConnection(AppException error) =>
+      error is NetworkException && error.type == NetworkErrorType.noConnection;
 
   void _scheduleRetry() {
     if (!_active) return;
@@ -181,6 +243,7 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
     if (active) {
       unawaited(refresh());
     } else {
+      _refreshOnReconnect = false;
       _retryTimer?.cancel();
     }
   }
@@ -190,6 +253,7 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
     _retryTimer?.cancel();
     final closing = super.close();
     await _subscription.cancel();
+    await _connectionSubscription?.cancel();
     await _filtersRepository.close();
     await closing;
   }

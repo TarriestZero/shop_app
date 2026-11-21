@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
@@ -8,6 +9,7 @@ import 'package:shop_app/api/source/users_api_source.dart';
 import 'package:shop_app/app/app_scope.dart';
 import 'package:shop_app/app/shop_app.dart';
 import 'package:shop_app/core/storage/shared_preferences_service.dart';
+import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:shop_app/features/auth/data/repositories/auth_repository.dart';
 import 'package:shop_app/features/cart/data/repositories/cart_repository.dart';
 import 'package:shop_app/features/cart/data/local/cart_local_data_source.dart';
@@ -23,6 +25,9 @@ void main() {
     AppScope(
       child: MultiRepositoryProvider(
         providers: [
+          RepositoryProvider(
+            create: (_) => NetworkConnectionService(Connectivity()),
+          ),
           RepositoryProvider(
             create: (context) => CatalogRepository(
               ProductsApiSource(context.read<Dio>()),

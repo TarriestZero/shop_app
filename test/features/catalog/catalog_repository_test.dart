@@ -30,6 +30,8 @@ void main() {
     );
 
     expect(loaded.single.priceInCents, 1099);
+    expect(loaded.single.rating, 4.6);
+    expect(loaded.single.ratingCount, 120);
     expect(await restarted.getCachedCatalog(), loaded);
     expect(storage.snapshot?['version'], 1);
     expect(storage.snapshot?['savedAt'], isA<String>());
@@ -91,7 +93,12 @@ void main() {
 
 class _Client extends Fake implements ProductsApiSource {
   List<ProductDto> products = const [
-    ProductDto(id: 1, title: 'Товар', price: 10.99),
+    ProductDto(
+      id: 1,
+      title: 'Товар',
+      price: 10.99,
+      rating: ProductRatingDto(rate: 4.6, count: 120),
+    ),
   ];
 
   @override
