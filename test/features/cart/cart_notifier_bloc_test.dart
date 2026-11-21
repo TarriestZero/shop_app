@@ -10,6 +10,45 @@ import 'package:shop_app/features/cart/domain/entity/cart_item.dart';
 import '../../support/cart_test_support.dart';
 
 void main() {
+  test('Команда оформления очищает корзину только после сохранения', () async {
+    final preferences = MemoryCartPreferences();
+    final repository = createCartRepository(preferences);
+    await repository.add(cartProduct.withQuantity(3));
+    final bloc = CartNotifierBloc(repository);
+    addTearDown(bloc.close);
+    await _start(bloc);
+    final pending = Completer<void>();
+    preferences.beforeWrite = () => pending.future;
+    final saving = bloc.stream.firstWhere((state) => state is CartSaving);
+    final clear = bloc.clearCart();
+    await saving;
+    expect(bloc.state.quantityFor(1), 3);
+    pending.complete();
+    expect(await clear, isTrue);
+    expect(bloc.state.items, isEmpty);
+    expect(await createCartRepository(preferences).load(), isEmpty);
+    expect(await bloc.clearCart(), isFalse);
+  });
+
+  test(
+    'Ошибка очистки возвращает отказ и позволяет оформить повторно',
+    () async {
+      final preferences = MemoryCartPreferences();
+      final repository = createCartRepository(preferences);
+      await repository.add(cartProduct);
+      final bloc = CartNotifierBloc(repository);
+      addTearDown(bloc.close);
+      await _start(bloc);
+      preferences.failWrites = true;
+      expect(await bloc.clearCart(), isFalse);
+      expect(bloc.state, isA<CartUpdateFailure>());
+      expect(bloc.state.quantityFor(1), 1);
+      preferences.failWrites = false;
+      expect(await bloc.clearCart(), isTrue);
+      expect(bloc.state.items, isEmpty);
+    },
+  );
+
   group('Загрузка состояния корзины из подставного репозитория', () {
     late _LoadRepository repository;
     const other = CartItem(

@@ -9,6 +9,7 @@ import 'package:shop_app/features/catalog/presentation/catalog/widgets/catalog_p
 import 'package:shop_app/foundation/foundation.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
 import 'package:shop_app/navigation/app_router.dart';
+import 'package:shop_app/ui_kit/ui_kit.dart';
 
 @RoutePage()
 class CatalogScreen extends StatefulWidget implements AutoRouteWrapper {
@@ -56,7 +57,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             buildWhen: (previous, current) =>
                 current is! CatalogFiltersSelected &&
                 current is! CatalogProductSelected,
-            builder: (context, state) => IconButton(
+            builder: (context, state) => AppButton.icon(
               tooltip: strings.filtersTitle,
               onPressed: state is CatalogLoaded
                   ? context.read<CatalogCubit>().openFilters
@@ -244,9 +245,9 @@ class _CatalogStatus extends StatelessWidget {
                     ],
                     if (onRetry != null) ...[
                       const SizedBox(height: 20),
-                      FilledButton(
+                      AppButton(
                         onPressed: onRetry,
-                        child: Text(AppLocalizations.of(context)!.retry),
+                        label: AppLocalizations.of(context)!.retry,
                       ),
                     ],
                   ],

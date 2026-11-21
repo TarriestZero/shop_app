@@ -32,3 +32,9 @@ final class CartProductRemoved extends CartEvent {
   final int productId;
   final Completer<bool> completion;
 }
+
+final class CartCleared extends CartEvent {
+  const CartCleared(this.completion);
+
+  final Completer<bool> completion;
+}

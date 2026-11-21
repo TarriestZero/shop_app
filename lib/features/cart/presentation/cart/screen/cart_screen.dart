@@ -8,6 +8,7 @@ import 'package:shop_app/features/cart/presentation/cart/widgets/cart_item_card.
 import 'package:shop_app/foundation/foundation.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
 import 'package:shop_app/navigation/app_router.dart';
+import 'package:shop_app/ui_kit/ui_kit.dart';
 
 @RoutePage()
 class CartScreen extends StatelessWidget {
@@ -39,11 +40,11 @@ class CartScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
-                      FilledButton(
+                      AppButton(
                         onPressed: () => context.read<CartNotifierBloc>().add(
                           const CartStarted(),
                         ),
-                        child: Text(strings.retry),
+                        label: strings.retry,
                       ),
                     ],
                   ),
@@ -112,11 +113,11 @@ class CartScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      FilledButton(
+                      AppButton(
                         onPressed: state is CartSaving
                             ? null
                             : () => context.router.push(const CheckoutRoute()),
-                        child: Text(strings.cartCheckout),
+                        label: strings.cartCheckout,
                       ),
                     ],
                   ),

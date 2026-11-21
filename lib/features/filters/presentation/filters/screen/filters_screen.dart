@@ -4,6 +4,7 @@ import 'package:shop_app/core/exceptions/user_error_message.dart';
 import 'package:shop_app/features/filters/presentation/filters/bloc/filters_controller.dart';
 import 'package:shop_app/foundation/foundation.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
+import 'package:shop_app/ui_kit/ui_kit.dart';
 
 /// Общая страница фильтров. Создание и закрытие контроллера остаётся у владельца.
 class FiltersScreen<T> extends StatelessWidget {
@@ -31,9 +32,9 @@ class FiltersScreen<T> extends StatelessWidget {
           appBar: AppBar(
             title: Text(strings.filtersTitle),
             actions: [
-              TextButton(
+              AppButton.text(
                 onPressed: controller.reset,
-                child: Text(strings.filtersReset),
+                label: strings.filtersReset,
               ),
             ],
           ),
@@ -61,9 +62,9 @@ class FiltersScreen<T> extends StatelessWidget {
                           style: TextStyle(color: context.colors.error),
                           textAlign: TextAlign.center,
                         ),
-                        TextButton(
+                        AppButton.text(
                           onPressed: controller.load,
-                          child: Text(strings.retry),
+                          label: strings.retry,
                         ),
                       ],
                     ),
@@ -76,15 +77,13 @@ class FiltersScreen<T> extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
                     width: double.infinity,
-                    child: FilledButton(
+                    child: AppButton(
                       onPressed: state is FiltersReady<T>
                           ? controller.apply
                           : null,
-                      child: Text(
-                        state.count == null
-                            ? strings.filtersApply
-                            : strings.filtersShowResults(state.count!),
-                      ),
+                      label: state.count == null
+                          ? strings.filtersApply
+                          : strings.filtersShowResults(state.count!),
                     ),
                   ),
                 ),

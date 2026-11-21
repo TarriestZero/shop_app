@@ -61,6 +61,12 @@ class CartRepository {
     return _save(items.where((item) => item.productId != productId).toList());
   });
 
+  /// Сохраняет пустую корзину одной операцией и возвращает её новый снимок.
+  Future<List<CartItem>> clear() => _enqueue(() async {
+    final items = await _ensureLoaded();
+    return items.isEmpty ? items : _save(const []);
+  });
+
   Future<List<CartItem>> _ensureLoaded() async =>
       _items ??= List.unmodifiable(await _storage.read());
 

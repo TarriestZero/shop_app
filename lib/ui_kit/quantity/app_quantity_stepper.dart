@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/foundation/foundation.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
+import 'package:shop_app/ui_kit/button/app_button.dart';
 
 /// Компактный счётчик количества с кнопками уменьшения и увеличения.
 class AppQuantityStepper extends StatelessWidget {
@@ -28,7 +29,7 @@ class AppQuantityStepper extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
+          AppButton.icon(
             tooltip: strings.cartDecreaseQuantity,
             visualDensity: VisualDensity.compact,
             onPressed: onDecrease,
@@ -45,7 +46,7 @@ class AppQuantityStepper extends StatelessWidget {
                   ?.copyWith(color: colors.textPrimary),
             ),
           ),
-          IconButton(
+          AppButton.icon(
             tooltip: strings.cartIncreaseQuantity,
             visualDensity: VisualDensity.compact,
             onPressed: onIncrease,

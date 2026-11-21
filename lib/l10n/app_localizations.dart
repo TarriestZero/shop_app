@@ -370,6 +370,78 @@ abstract class AppLocalizations {
   /// **'Оформление заказа'**
   String get checkoutTitle;
 
+  /// No description provided for @checkoutName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя'**
+  String get checkoutName;
+
+  /// No description provided for @checkoutEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Email'**
+  String get checkoutEmail;
+
+  /// No description provided for @checkoutPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Телефон'**
+  String get checkoutPhone;
+
+  /// No description provided for @checkoutAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес'**
+  String get checkoutAddress;
+
+  /// No description provided for @checkoutSubmit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оформить'**
+  String get checkoutSubmit;
+
+  /// No description provided for @checkoutSubmitting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оформляем…'**
+  String get checkoutSubmitting;
+
+  /// No description provided for @checkoutFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось оформить заказ. Попробуйте ещё раз.'**
+  String get checkoutFailed;
+
+  /// No description provided for @checkoutSuccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заказ оформлен'**
+  String get checkoutSuccess;
+
+  /// No description provided for @returnToCatalog.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вернуться в каталог'**
+  String get returnToCatalog;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обязательное поле'**
+  String get fieldRequired;
+
+  /// No description provided for @fieldInvalidEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите корректный email'**
+  String get fieldInvalidEmail;
+
+  /// No description provided for @fieldInvalidPhone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите не менее {count} цифр'**
+  String fieldInvalidPhone(int count);
+
   /// No description provided for @productDetailsTitle.
   ///
   /// In ru, this message translates to:

@@ -165,6 +165,44 @@ class AppLocalizationsRu extends AppLocalizations {
   String get checkoutTitle => 'Оформление заказа';
 
   @override
+  String get checkoutName => 'Имя';
+
+  @override
+  String get checkoutEmail => 'Email';
+
+  @override
+  String get checkoutPhone => 'Телефон';
+
+  @override
+  String get checkoutAddress => 'Адрес';
+
+  @override
+  String get checkoutSubmit => 'Оформить';
+
+  @override
+  String get checkoutSubmitting => 'Оформляем…';
+
+  @override
+  String get checkoutFailed => 'Не удалось оформить заказ. Попробуйте ещё раз.';
+
+  @override
+  String get checkoutSuccess => 'Заказ оформлен';
+
+  @override
+  String get returnToCatalog => 'Вернуться в каталог';
+
+  @override
+  String get fieldRequired => 'Обязательное поле';
+
+  @override
+  String get fieldInvalidEmail => 'Введите корректный email';
+
+  @override
+  String fieldInvalidPhone(int count) {
+    return 'Введите не менее $count цифр';
+  }
+
+  @override
   String get productDetailsTitle => 'О товаре';
 
   @override

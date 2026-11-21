@@ -6,6 +6,40 @@ import 'package:shop_app/features/cart/domain/entity/cart_item.dart';
 import '../../support/cart_test_support.dart';
 
 void main() {
+  test(
+    'Очистка сохраняет пустую корзину между запусками одной записью',
+    () async {
+      final preferences = MemoryCartPreferences();
+      final repository = createCartRepository(preferences);
+      await repository.add(cartProduct.withQuantity(3));
+      await repository.add(
+        const CartItem(
+          productId: 2,
+          title: 'Второй товар',
+          priceInCents: 100,
+          quantity: 2,
+        ),
+      );
+      final writes = preferences.writes;
+      expect(await repository.clear(), isEmpty);
+      expect(preferences.writes, writes + 1);
+      expect(await createCartRepository(preferences).load(), isEmpty);
+      expect(await repository.clear(), isEmpty);
+      expect(preferences.writes, writes + 1);
+    },
+  );
+
+  test('Отказ записи при очистке сохраняет прежнюю корзину', () async {
+    final preferences = MemoryCartPreferences();
+    final repository = createCartRepository(preferences);
+    await repository.add(cartProduct.withQuantity(3));
+    final snapshot = preferences.snapshot;
+    preferences.failWrites = true;
+    await expectLater(repository.clear(), throwsA(isA<StorageException>()));
+    expect(await repository.load(), [cartProduct.withQuantity(3)]);
+    expect(preferences.snapshot, same(snapshot));
+  });
+
   test('Новое хранилище возвращает пустую корзину без записи', () async {
     final preferences = MemoryCartPreferences();
     final items = await createCartRepository(preferences).load();

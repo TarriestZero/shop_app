@@ -9,6 +9,7 @@ import 'package:shop_app/features/catalog/presentation/product_details/widgets/p
 import 'package:shop_app/features/catalog/presentation/product_details/widgets/product_details_content.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
 import 'package:shop_app/navigation/app_router.dart';
+import 'package:shop_app/ui_kit/ui_kit.dart';
 
 @RoutePage()
 class ProductDetailsScreen extends StatelessWidget implements AutoRouteWrapper {
@@ -58,7 +59,7 @@ class ProductDetailsScreen extends StatelessWidget implements AutoRouteWrapper {
         appBar: AppBar(
           title: Text(strings.productDetailsTitle),
           actions: [
-            IconButton(
+            AppButton.icon(
               tooltip: strings.cartTitle,
               onPressed: context.read<ProductDetailsCubit>().openCart,
               icon: const CartTabIcon(),
@@ -135,9 +136,9 @@ class _ProductStatus extends StatelessWidget {
                   Text(description!, textAlign: TextAlign.center),
                 ],
                 const SizedBox(height: 16),
-                FilledButton(
+                AppButton(
                   onPressed: onRetry,
-                  child: Text(AppLocalizations.of(context)!.retry),
+                  label: AppLocalizations.of(context)!.retry,
                 ),
               ],
             ),

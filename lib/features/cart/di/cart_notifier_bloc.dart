@@ -19,17 +19,24 @@ class CartNotifierBloc extends Bloc<CartEvent, CartState> {
   }
 
   final CartRepository _repository;
-  final _removals = <Completer<bool>>{};
+  final _commands = <Completer<bool>>{};
   bool _closing = false;
 
   /// Удаляет всю позицию и возвращает результат сохранения для Dismissible.
   /// Ожидается результат команды, без подписок на состояния других блоков.
-  Future<bool> removeProduct(int productId) {
+  Future<bool> removeProduct(int productId) =>
+      _runCommand((completion) => CartProductRemoved(productId, completion));
+
+  /// Очищает непустую корзину для оформления. При ошибке или отсутствии товаров
+  /// возвращает false и сохраняет прежнее состояние.
+  Future<bool> clearCart() => _runCommand(CartCleared.new);
+
+  Future<bool> _runCommand(CartEvent Function(Completer<bool>) createEvent) {
     if (_closing || isClosed) return Future.value(false);
     final completion = Completer<bool>();
-    _removals.add(completion);
-    add(CartProductRemoved(productId, completion));
-    return completion.future.whenComplete(() => _removals.remove(completion));
+    _commands.add(completion);
+    add(createEvent(completion));
+    return completion.future.whenComplete(() => _commands.remove(completion));
   }
 
   Future<void> _onEvent(CartEvent event, Emitter<CartState> emit) async {
@@ -46,7 +53,11 @@ class CartNotifierBloc extends Bloc<CartEvent, CartState> {
 
     final current = state;
     if (current is! CartData) {
-      _completeRemoval(event, false);
+      _completeCommand(event, false);
+      return;
+    }
+    if (event is CartCleared && current.items.isEmpty) {
+      _completeCommand(event, false);
       return;
     }
     emit(CartSaving(current.items));
@@ -62,26 +73,32 @@ class CartNotifierBloc extends Bloc<CartEvent, CartState> {
           -1,
         ),
         CartProductRemoved() => _repository.remove(event.productId),
+        CartCleared() => _repository.clear(),
         CartStarted() => throw StateError('Unexpected cart initialization'),
       };
       emit(CartReady(items));
-      _completeRemoval(event, true);
+      _completeCommand(event, true);
     } on AppException catch (error) {
       emit(CartUpdateFailure(current.items, error));
-      _completeRemoval(event, false);
+      _completeCommand(event, false);
     }
   }
 
-  void _completeRemoval(CartEvent event, bool success) {
-    if (event is CartProductRemoved && !event.completion.isCompleted) {
-      event.completion.complete(success);
+  void _completeCommand(CartEvent event, bool success) {
+    final completion = switch (event) {
+      CartProductRemoved() => event.completion,
+      CartCleared() => event.completion,
+      _ => null,
+    };
+    if (completion != null && !completion.isCompleted) {
+      completion.complete(success);
     }
   }
 
   @override
   Future<void> close() {
     _closing = true;
-    for (final completion in _removals) {
+    for (final completion in _commands) {
       if (!completion.isCompleted) completion.complete(false);
     }
     return super.close();
