@@ -3,6 +3,7 @@ import 'package:retrofit/retrofit.dart';
 import 'package:shop_app/api/api_config.dart';
 import 'package:shop_app/api/dto/api_sort_order.dart';
 import 'package:shop_app/api/dto/cart_dto.dart';
+import 'package:shop_app/core/network/empty_response_interceptor.dart';
 
 part 'carts_api_source.g.dart';
 
@@ -21,6 +22,7 @@ abstract class CartsApiSource {
 
   /// Получает корзину по ID. Возвращает `null`, если корзина отсутствует.
   @GET('/carts/{id}')
+  @Extra({EmptyResponseInterceptor.allowEmptyResponse: true})
   Future<CartDto?> getCart(@Path('id') int id);
 
   /// Получает корзины пользователя с фильтром дат в формате `YYYY-MM-DD`.
@@ -45,5 +47,6 @@ abstract class CartsApiSource {
 
   /// Запрашивает удаление корзины и возвращает данные найденной корзины.
   @DELETE('/carts/{id}')
+  @Extra({EmptyResponseInterceptor.allowEmptyResponse: true})
   Future<CartDto?> deleteCart(@Path('id') int id);
 }

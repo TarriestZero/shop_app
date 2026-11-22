@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/api/api_config.dart';
+import 'package:shop_app/core/network/empty_response_interceptor.dart';
 import 'package:shop_app/core/storage/shared_preferences_service.dart';
 
 /// Предоставляет общий HTTP-клиент и сервис хранения всему приложению.
@@ -24,7 +25,7 @@ class AppScope extends StatelessWidget {
               receiveTimeout: ApiConfig.timeout,
               contentType: Headers.jsonContentType,
             ),
-          ),
+          )..interceptors.add(EmptyResponseInterceptor()),
           dispose: (dio) => dio.close(),
         ),
         RepositoryProvider(

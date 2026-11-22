@@ -57,7 +57,7 @@ class _ProductsApiSource implements ProductsApiSource {
 
   @override
   Future<ProductDto?> getProduct(int id) async {
-    final _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{'allow_empty_response': true};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -232,7 +232,7 @@ class _ProductsApiSource implements ProductsApiSource {
 
   @override
   Future<ProductDto?> deleteProduct(int id) async {
-    final _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{'allow_empty_response': true};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

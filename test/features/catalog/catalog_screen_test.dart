@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/api/dto/product_dto.dart';
 import 'package:shop_app/app/shop_app.dart';
+import 'package:shop_app/core/exceptions/network_exception.dart';
 import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:shop_app/features/cart/di/cart_notifier_bloc.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
@@ -17,6 +18,33 @@ import '../../support/network_test_support.dart';
 const _timeoutMessage = 'Истекло время ожидания ответа. Попробуйте ещё раз.';
 
 void main() {
+  for (final (error, message) in [
+    (
+      const NetworkException.client(statusCode: 409),
+      'Сервер отклонил запрос. Проверьте данные и попробуйте ещё раз.',
+    ),
+    (
+      const NetworkException.emptyResponse(statusCode: 204),
+      'Сервер вернул пустой ответ. Попробуйте ещё раз.',
+    ),
+  ]) {
+    testWidgets('Каталог показывает отдельное сообщение для ${error.type}', (
+      tester,
+    ) async {
+      final client = CatalogTestClient()..error = error;
+      await _pumpCatalog(tester, client: client);
+      await tester.pumpAndSettle();
+      expect(find.text(message), findsOneWidget);
+      expect(find.text('Нет соединения'), findsNothing);
+      expect(find.text('Не удалось обработать данные сервера'), findsNothing);
+      expect(find.text('В каталоге пока нет товаров'), findsNothing);
+      client.error = null;
+      await tester.tap(find.widgetWithText(FilledButton, 'Повторить'));
+      await tester.pumpAndSettle();
+      expect(find.text(detailsProduct.title!), findsOneWidget);
+    });
+  }
+
   testWidgets(
     'Каталог показывает загрузку, отдельный таймаут и успех после повтора',
     (tester) async {

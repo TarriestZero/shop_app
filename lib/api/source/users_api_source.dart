@@ -3,6 +3,7 @@ import 'package:retrofit/retrofit.dart';
 import 'package:shop_app/api/api_config.dart';
 import 'package:shop_app/api/dto/api_sort_order.dart';
 import 'package:shop_app/api/dto/user_dto.dart';
+import 'package:shop_app/core/network/empty_response_interceptor.dart';
 
 part 'users_api_source.g.dart';
 
@@ -19,6 +20,7 @@ abstract class UsersApiSource {
 
   /// Получает пользователя по ID. Возвращает `null`, если он отсутствует.
   @GET('/users/{id}')
+  @Extra({EmptyResponseInterceptor.allowEmptyResponse: true})
   Future<UserDto?> getUser(@Path('id') int id);
 
   /// Отправляет данные нового пользователя.
@@ -35,5 +37,6 @@ abstract class UsersApiSource {
 
   /// Запрашивает удаление пользователя и возвращает его данные.
   @DELETE('/users/{id}')
+  @Extra({EmptyResponseInterceptor.allowEmptyResponse: true})
   Future<UserDto?> deleteUser(@Path('id') int id);
 }

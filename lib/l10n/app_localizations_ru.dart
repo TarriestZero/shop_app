@@ -86,6 +86,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get resourceNotFound => 'Запрашиваемые данные не найдены';
 
   @override
+  String get clientError =>
+      'Сервер отклонил запрос. Проверьте данные и попробуйте ещё раз.';
+
+  @override
   String get serverError => 'Ошибка сервера. Попробуйте позже.';
 
   @override
@@ -93,6 +97,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get invalidServerResponse => 'Не удалось обработать данные сервера';
+
+  @override
+  String get emptyServerResponse =>
+      'Сервер вернул пустой ответ. Попробуйте ещё раз.';
 
   @override
   String get requestCancelled => 'Запрос отменён';

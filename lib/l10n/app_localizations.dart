@@ -232,6 +232,12 @@ abstract class AppLocalizations {
   /// **'Запрашиваемые данные не найдены'**
   String get resourceNotFound;
 
+  /// No description provided for @clientError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер отклонил запрос. Проверьте данные и попробуйте ещё раз.'**
+  String get clientError;
+
   /// No description provided for @serverError.
   ///
   /// In ru, this message translates to:
@@ -249,6 +255,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Не удалось обработать данные сервера'**
   String get invalidServerResponse;
+
+  /// No description provided for @emptyServerResponse.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер вернул пустой ответ. Попробуйте ещё раз.'**
+  String get emptyServerResponse;
 
   /// No description provided for @requestCancelled.
   ///

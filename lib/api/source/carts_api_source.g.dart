@@ -64,7 +64,7 @@ class _CartsApiSource implements CartsApiSource {
 
   @override
   Future<CartDto?> getCart(int id) async {
-    final _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{'allow_empty_response': true};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -212,7 +212,7 @@ class _CartsApiSource implements CartsApiSource {
 
   @override
   Future<CartDto?> deleteCart(int id) async {
-    final _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{'allow_empty_response': true};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

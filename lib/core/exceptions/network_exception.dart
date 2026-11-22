@@ -6,9 +6,11 @@ enum NetworkErrorType {
   unauthorized,
   forbidden,
   notFound,
+  client,
   server,
   tooManyRequests,
   invalidResponse,
+  emptyResponse,
   cancelled,
   badCertificate,
   custom,
@@ -32,6 +34,9 @@ final class NetworkException extends AppException {
   const NetworkException.notFound()
     : this._(NetworkErrorType.notFound, statusCode: 404);
 
+  const NetworkException.client({required int statusCode, String? message})
+    : this._(NetworkErrorType.client, statusCode: statusCode, message: message);
+
   const NetworkException.server({required int statusCode})
     : this._(NetworkErrorType.server, statusCode: statusCode);
 
@@ -39,6 +44,9 @@ final class NetworkException extends AppException {
     : this._(NetworkErrorType.tooManyRequests, statusCode: 429);
 
   const NetworkException.parse() : this._(NetworkErrorType.invalidResponse);
+
+  const NetworkException.emptyResponse({int? statusCode})
+    : this._(NetworkErrorType.emptyResponse, statusCode: statusCode);
 
   const NetworkException.cancelled() : this._(NetworkErrorType.cancelled);
 

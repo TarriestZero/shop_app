@@ -37,6 +37,7 @@ AppException _mapDio(DioException error) {
     DioExceptionType.cancel => const NetworkException.cancelled(),
     DioExceptionType.transformTimeout => const NetworkException.parse(),
     DioExceptionType.unknown => switch (error.error) {
+      final AppException exception => exception,
       SocketException() => const NetworkException.noConnection(),
       TimeoutException() => const NetworkException.timeout(),
       HandshakeException() => const NetworkException.badCertificate(),
@@ -58,6 +59,8 @@ AppException _mapHttp(Response<dynamic>? response) {
     404 => const NetworkException.notFound(),
     408 => const NetworkException.timeout(statusCode: 408),
     429 => const NetworkException.tooManyRequests(),
+    final int status when status >= 400 && status <= 499 =>
+      NetworkException.client(statusCode: status, message: message),
     final int status when status >= 500 && status <= 599 =>
       NetworkException.server(statusCode: status),
     _ => NetworkException.custom(message: message, statusCode: status),
