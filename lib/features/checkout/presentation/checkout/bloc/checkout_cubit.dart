@@ -10,21 +10,29 @@ abstract interface class CheckoutActions {
 /// Оформляет локальный заказ через команду сохранения пустой корзины.
 /// Валидация полей остаётся в Form и TextFormField представления.
 class CheckoutCubit extends Cubit<CheckoutState> implements CheckoutActions {
-  CheckoutCubit({required this._clearCart, String Function()? createOrderId})
-    : _createOrderId = createOrderId ?? _localOrderId,
-      super(const CheckoutInitial());
+  CheckoutCubit({
+    required this._clearCart,
+    required this._hasConnection,
+    String Function()? createOrderId,
+  }) : _createOrderId = createOrderId ?? _localOrderId,
+       super(const CheckoutInitial());
 
   final Future<bool> Function() _clearCart;
   final String Function() _createOrderId;
+  final bool Function() _hasConnection;
 
   static String _localOrderId() =>
       DateTime.now().microsecondsSinceEpoch.toString();
 
   /// Создаёт номер заказа после успешной очистки корзины; повторное нажатие
   /// во время оформления или после успеха игнорируется.
+  /// Без соединения не очищает корзину и не создаёт заказ.
   @override
   Future<void> submit() async {
-    if (isClosed || state is CheckoutSubmitting || state is CheckoutSuccess) {
+    if (isClosed ||
+        state is CheckoutSubmitting ||
+        state is CheckoutSuccess ||
+        !_hasConnection()) {
       return;
     }
     emit(const CheckoutSubmitting());

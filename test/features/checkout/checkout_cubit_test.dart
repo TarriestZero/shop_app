@@ -5,9 +5,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shop_app/features/checkout/presentation/checkout/bloc/checkout_cubit.dart';
 
 void main() {
+  test(
+    'Без связи команда не очищает корзину, восстановление разрешает заказ',
+    () async {
+      var connected = false;
+      var clears = 0;
+      var generated = 0;
+      final cubit = CheckoutCubit(
+        hasConnection: () => connected,
+        clearCart: () async {
+          clears++;
+          return true;
+        },
+        createOrderId: () => '${++generated}',
+      );
+      addTearDown(cubit.close);
+      await cubit.submit();
+      expect(cubit.state, const CheckoutInitial());
+      expect(clears, 0);
+      expect(generated, 0);
+
+      connected = true;
+      await cubit.submit();
+      expect(cubit.state, const CheckoutSuccess('1'));
+      expect(clears, 1);
+    },
+  );
+
   blocTest<CheckoutCubit, CheckoutState>(
     'Успех выдаёт локальный номер после сохранения пустой корзины',
     build: () => CheckoutCubit(
+      hasConnection: () => true,
       clearCart: () async => true,
       createOrderId: () => 'LOCAL-42',
     ),
@@ -22,6 +50,7 @@ void main() {
     var allowed = false;
     var generated = 0;
     final cubit = CheckoutCubit(
+      hasConnection: () => true,
       clearCart: () async => allowed,
       createOrderId: () => '${++generated}',
     );
@@ -43,6 +72,7 @@ void main() {
       var clears = 0;
       var generated = 0;
       final cubit = CheckoutCubit(
+        hasConnection: () => true,
         clearCart: () {
           clears++;
           return pending.future;
@@ -71,6 +101,7 @@ void main() {
       final pending = Completer<bool>();
       var generated = 0;
       final cubit = CheckoutCubit(
+        hasConnection: () => true,
         clearCart: () => pending.future,
         createOrderId: () => '${++generated}',
       );

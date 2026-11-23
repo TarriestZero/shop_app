@@ -3,10 +3,11 @@ import 'package:shop_app/core/network/network_connection_service.dart';
 
 class TestNetworkConnectionService extends Fake
     implements NetworkConnectionService {
-  TestNetworkConnectionService([this.changes = const Stream.empty()]);
+  TestNetworkConnectionService([Stream<bool>? changes])
+    : changes = changes?.asBroadcastStream();
 
-  final Stream<bool> changes;
+  final Stream<bool>? changes;
 
   @override
-  Stream<bool> watch() => changes;
+  Stream<bool> watch() => changes ?? Stream.value(true);
 }

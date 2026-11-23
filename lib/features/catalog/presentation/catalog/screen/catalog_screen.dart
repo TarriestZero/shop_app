@@ -114,6 +114,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         fallback: strings.catalogRefreshFailed,
                       ),
                     ),
+                    action: SnackBarAction(
+                      label: strings.retry,
+                      onPressed: () => context.read<CatalogCubit>().refresh(),
+                    ),
                   ),
                 );
               default:
@@ -158,6 +162,7 @@ class _CatalogContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context)!;
     final colors = context.colors;
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
 
     return Column(
       children: [
@@ -173,6 +178,10 @@ class _CatalogContent extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(child: Text(strings.noConnection)),
+                AppButton.text(
+                  onPressed: context.read<CatalogCubit>().refresh,
+                  label: strings.retry,
+                ),
               ],
             ),
           ),
@@ -194,13 +203,12 @@ class _CatalogContent extends StatelessWidget {
                 : GridView.builder(
                     padding: const EdgeInsets.all(16),
                     physics: const AlwaysScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 240,
-                          childAspectRatio: 0.6,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                        ),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 240 * textScale,
+                      childAspectRatio: 0.6,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                    ),
                     itemCount: state.products.length,
                     itemBuilder: (context, index) {
                       final product = state.products[index];

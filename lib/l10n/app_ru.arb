@@ -61,6 +61,7 @@
   "cartTotal": "Итого",
   "cartCheckout": "К оформлению",
   "checkoutTitle": "Оформление заказа",
+  "checkoutNeedsConnection": "Для оформления заказа подключитесь к интернету.",
   "checkoutName": "Имя",
   "checkoutEmail": "Email",
   "checkoutPhone": "Телефон",

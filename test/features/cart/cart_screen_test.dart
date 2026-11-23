@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -14,6 +16,42 @@ import '../../support/cart_test_support.dart';
 import '../../support/network_test_support.dart';
 
 void main() {
+  testWidgets(
+    'Без сети переход к оформлению недоступен, корзину можно менять',
+    (tester) async {
+      final connections = StreamController<bool>.broadcast();
+      addTearDown(connections.close);
+      final preferences = MemoryCartPreferences();
+      await createCartRepository(preferences).add(cartProduct);
+      final cart = await _pumpApp(
+        tester,
+        preferences,
+        connectionChanges: connections.stream,
+      );
+      await _openCart(tester);
+      connections.add(false);
+      await tester.pumpAndSettle();
+      final button = find.widgetWithText(FilledButton, 'К оформлению');
+      expect(tester.widget<FilledButton>(button).onPressed, isNull);
+      expect(
+        find.text('Для оформления заказа подключитесь к интернету.'),
+        findsOneWidget,
+      );
+      await tester.tap(find.byTooltip('Увеличить количество'));
+      await tester.pumpAndSettle();
+      expect(cart.state.quantityFor(1), 2);
+      expect(tester.widget<FilledButton>(button).onPressed, isNull);
+
+      connections.add(true);
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+      expect(
+        find.text('Для оформления заказа подключитесь к интернету.'),
+        findsNothing,
+      );
+    },
+  );
+
   testWidgets('Кнопка пустой корзины открывает вкладку каталога', (
     tester,
   ) async {
@@ -142,8 +180,9 @@ Future<void> _openCart(WidgetTester tester) async {
 
 Future<CartNotifierBloc> _pumpApp(
   WidgetTester tester,
-  MemoryCartPreferences preferences,
-) async {
+  MemoryCartPreferences preferences, {
+  Stream<bool>? connectionChanges,
+}) async {
   final bloc = CartNotifierBloc(createCartRepository(preferences))
     ..add(const CartStarted());
   addTearDown(() async {
@@ -157,7 +196,7 @@ Future<CartNotifierBloc> _pumpApp(
           value: _CatalogRepository(),
         ),
         RepositoryProvider<NetworkConnectionService>.value(
-          value: TestNetworkConnectionService(),
+          value: TestNetworkConnectionService(connectionChanges),
         ),
       ],
       child: BlocProvider.value(value: bloc, child: const ShopApp()),
@@ -168,6 +207,12 @@ Future<CartNotifierBloc> _pumpApp(
 }
 
 class _CatalogRepository extends Fake implements CatalogRepository {
+  @override
+  bool get isOffline => false;
+
+  @override
+  Stream<bool> get offlineChanges => const Stream.empty();
+
   @override
   Stream<List<CatalogProduct>> get changes => const Stream.empty();
 

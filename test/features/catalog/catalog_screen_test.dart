@@ -10,6 +10,7 @@ import 'package:shop_app/core/exceptions/network_exception.dart';
 import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:shop_app/features/cart/di/cart_notifier_bloc.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
+import 'package:shop_app/features/catalog/presentation/product_details/screen/product_details_screen.dart';
 
 import '../../support/cart_test_support.dart';
 import '../../support/catalog_test_support.dart';
@@ -18,6 +19,102 @@ import '../../support/network_test_support.dart';
 const _timeoutMessage = 'Истекло время ожидания ответа. Попробуйте ещё раз.';
 
 void main() {
+  testWidgets(
+    'Индикатор офлайна сохраняется при открытии товара и исчезает после повтора',
+    (tester) async {
+      final client = CatalogTestClient()
+        ..error = const NetworkException.noConnection();
+      await _pumpCatalog(
+        tester,
+        client: client,
+        cache: CatalogTestCache()..products = [detailsProduct],
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(detailsProduct.title!));
+      await tester.pumpAndSettle();
+      expect(find.byType(ProductDetailsScreen), findsOneWidget);
+      expect(find.text('Нет соединения'), findsOneWidget);
+      expect(client.requests, 1);
+
+      client.error = null;
+      await tester
+          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+          .onRefresh();
+      await tester.pumpAndSettle();
+      expect(find.text('Нет соединения'), findsNothing);
+      expect(client.requests, 2);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('Каталог на узком экране поддерживает шрифт 200% и корзину', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 640));
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(() async {
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
+      await tester.binding.setSurfaceSize(null);
+    });
+    final client = CatalogTestClient()
+      ..products = const [
+        ProductDto(
+          id: 1,
+          title: 'Длинное название товара для двух строк',
+          price: 10,
+          category: 'Категория',
+        ),
+      ];
+    await _pumpCatalog(tester, client: client);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    final grid = tester.widget<GridView>(find.byType(GridView));
+    final card = find.byTooltip('В корзину');
+    expect(grid.childrenDelegate.estimatedChildCount, 1);
+    await tester.tap(card);
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Увеличить количество'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final error in [
+    const NetworkException.server(statusCode: 503),
+    const NetworkException.noConnection(),
+  ]) {
+    testWidgets(
+      'Повтор обновления после ${error.type} сохраняет каталог до ответа',
+      (tester) async {
+        final client = CatalogTestClient()..error = error;
+        await _pumpCatalog(
+          tester,
+          client: client,
+          cache: CatalogTestCache()..products = [detailsProduct],
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(detailsProduct.title!), findsOneWidget);
+        expect(find.text('Повторить'), findsOneWidget);
+        if (error.type == NetworkErrorType.noConnection) {
+          expect(find.text('Нет соединения'), findsOneWidget);
+        }
+
+        final pending = Completer<List<ProductDto>>();
+        client.fetch = () => pending.future;
+        await tester.tap(find.text('Повторить'));
+        await tester.pump();
+        expect(client.requests, 2);
+        expect(find.text(detailsProduct.title!), findsOneWidget);
+        expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+        pending.complete([otherDetailsProduct]);
+        await tester.pumpAndSettle();
+        expect(find.text(otherDetailsProduct.title!), findsOneWidget);
+        expect(find.text(detailsProduct.title!), findsNothing);
+        expect(find.text('Нет соединения'), findsNothing);
+      },
+    );
+  }
+
   for (final (error, message) in [
     (
       const NetworkException.client(statusCode: 409),

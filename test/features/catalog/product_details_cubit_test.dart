@@ -8,6 +8,7 @@ import 'package:shop_app/core/exceptions/index.dart';
 import 'package:shop_app/features/catalog/data/mapper/catalog_product_mapper.dart';
 import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
 import 'package:shop_app/features/catalog/presentation/product_details/bloc/product_details_cubit.dart';
+import 'package:shop_app/features/catalog/presentation/catalog/bloc/catalog_cubit.dart';
 
 import '../../support/catalog_test_support.dart';
 
@@ -15,14 +16,110 @@ void main() {
   late CatalogTestClient client;
   late CatalogTestCache cache;
   late CatalogRepository repository;
+  late StreamController<bool> connections;
   final product = catalogProductFromDto(detailsProduct);
 
   setUp(() {
     client = CatalogTestClient();
     cache = CatalogTestCache();
-    repository = CatalogRepository(client, cache: cache);
+    connections = StreamController<bool>();
+    repository = CatalogRepository(
+      client,
+      cache: cache,
+      connectionChanges: connections.stream,
+    );
   });
-  tearDown(() => repository.close());
+  tearDown(() async {
+    await repository.close();
+    await connections.close();
+  });
+
+  test(
+    'Открытие товара из офлайн-каталога сохраняет индикатор без запроса',
+    () async {
+      cache.products = const [detailsProduct];
+      client.error = _connectionError();
+      final catalog = CatalogCubit(repository);
+      final details = ProductDetailsCubit(repository, productId: '1');
+      addTearDown(() async {
+        await catalog.close();
+        await details.close();
+      });
+      await catalog.load();
+      expect((catalog.state as CatalogLoaded).isOffline, isTrue);
+      await details.load();
+      expect(details.state, ProductDetailsLoaded(product, isOffline: true));
+      expect(client.requests, 1);
+
+      client.error = null;
+      final restored = expectLater(
+        details.stream,
+        emits(ProductDetailsLoaded(product)),
+      );
+      await catalog.refresh();
+      await restored;
+      expect(details.state, ProductDetailsLoaded(product));
+    },
+  );
+
+  test(
+    'Потеря сети обновляет открытый товар и новый экран из памяти',
+    () async {
+      await repository.loadCatalog();
+      final details = ProductDetailsCubit(repository, productId: '1');
+      addTearDown(details.close);
+      await details.load();
+      final offline = expectLater(
+        details.stream,
+        emits(ProductDetailsLoaded(product, isOffline: true)),
+      );
+      connections.add(false);
+      await offline;
+
+      final reopened = ProductDetailsCubit(repository, productId: '1');
+      addTearDown(reopened.close);
+      await reopened.load();
+      expect(reopened.state, ProductDetailsLoaded(product, isOffline: true));
+      expect(client.requests, 1);
+    },
+  );
+
+  test('Ошибка сети на странице товара обновляет индикатор каталога', () async {
+    final catalog = CatalogCubit(repository);
+    final details = ProductDetailsCubit(repository, productId: '1');
+    addTearDown(() async {
+      await catalog.close();
+      await details.close();
+    });
+    await catalog.load();
+    await details.load();
+    client.error = _connectionError();
+    await details.refresh();
+    await Future<void>.delayed(Duration.zero);
+    expect((catalog.state as CatalogLoaded).isOffline, isTrue);
+    expect((details.state as ProductDetailsLoaded).isOffline, isTrue);
+  });
+
+  test('Запоздалый ответ не скрывает потерю сети во время запроса', () async {
+    await repository.loadCatalog();
+    final details = ProductDetailsCubit(repository, productId: '1');
+    addTearDown(details.close);
+    await details.load();
+    final pending = Completer<List<ProductDto>>();
+    client.fetch = () => pending.future;
+    final refresh = details.refresh();
+    connections.add(false);
+    await Future<void>.delayed(Duration.zero);
+    pending.complete(const [detailsProduct]);
+    await refresh;
+    expect(details.state, ProductDetailsLoaded(product, isOffline: true));
+
+    connections.add(true);
+    await Future<void>.delayed(Duration.zero);
+    client.fetch = null;
+    await details.refresh();
+    expect(details.state, ProductDetailsLoaded(product));
+  });
 
   blocTest<ProductDetailsCubit, ProductDetailsState>(
     'Товар из памяти открывается без повторного запроса',
@@ -35,15 +132,17 @@ void main() {
 
   blocTest<ProductDetailsCubit, ProductDetailsState>(
     'Товар из кеша доступен без сети',
-    setUp: () {
+    setUp: () async {
       cache.products = const [detailsProduct];
       client.error = _connectionError();
+      connections.add(false);
+      await Future<void>.delayed(Duration.zero);
     },
     build: () => ProductDetailsCubit(repository, productId: '1'),
     act: (cubit) => cubit.load(),
     expect: () => [
       const ProductDetailsLoading(),
-      ProductDetailsLoaded(product),
+      ProductDetailsLoaded(product, isOffline: true),
     ],
     verify: (_) => expect(client.requests, 0),
   );

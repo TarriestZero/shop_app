@@ -15,6 +15,18 @@ void main() {
       'Введите корректный email',
     ),
     (AppTextFieldType.email, ' anna+order@example.co.uk ', true, null),
+    (AppTextFieldType.email, "o'connor@example.com", true, null),
+    for (final email in [
+      'a,b@example.com',
+      'a:b@example.com',
+      'a;b@example.com',
+      'a<b@example.com',
+      'a"b@example.com',
+      '.anna@example.com',
+      'anna.@example.com',
+      'anna..order@example.com',
+    ])
+      (AppTextFieldType.email, email, true, 'Введите корректный email'),
     (AppTextFieldType.email, '', false, null),
     (AppTextFieldType.phone, '123456789', true, 'Введите не менее 10 цифр'),
     (AppTextFieldType.phone, '+7 (999) 123-45-67', true, null),

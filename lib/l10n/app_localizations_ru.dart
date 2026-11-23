@@ -176,6 +176,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get checkoutTitle => 'Оформление заказа';
 
   @override
+  String get checkoutNeedsConnection =>
+      'Для оформления заказа подключитесь к интернету.';
+
+  @override
   String get checkoutName => 'Имя';
 
   @override

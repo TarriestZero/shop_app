@@ -24,7 +24,13 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
   CatalogCubit(this._repository, {Stream<bool>? connectionChanges})
     : super(const CatalogInitial()) {
     _subscription = _repository.changes.listen((products) {
-      if (!isClosed) _setProducts(products);
+      final current = state;
+      final offline = _hasConnection == false || _repository.isOffline;
+      if (!isClosed &&
+          (!identical(products, _lastSnapshot) ||
+              current is CatalogLoaded && current.isOffline != offline)) {
+        _setProducts(products);
+      }
     });
     _connectionSubscription = connectionChanges?.listen(
       _onConnectionChanged,
@@ -153,7 +159,10 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
           CatalogRefreshFailure(
             current.products,
             exception: error,
-            isOffline: _hasConnection == false || _isNoConnection(error),
+            isOffline:
+                _hasConnection == false ||
+                _repository.isOffline ||
+                _isNoConnection(error),
             filters: current.filters,
             totalCount: current.totalCount,
           ),
@@ -162,7 +171,10 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
         emit(
           CatalogLoadFailure(
             error,
-            isOffline: _hasConnection == false || _isNoConnection(error),
+            isOffline:
+                _hasConnection == false ||
+                _repository.isOffline ||
+                _isNoConnection(error),
           ),
         );
       }
@@ -181,7 +193,8 @@ class CatalogCubit extends Cubit<CatalogState> implements CatalogActions {
   }
 
   void _emitFiltered({bool? isOffline}) {
-    final offline = isOffline ?? _hasConnection == false;
+    final offline =
+        isOffline ?? (_hasConnection == false || _repository.isOffline);
     emit(
       _allProducts.isEmpty
           ? CatalogEmpty(filters: _filters, isOffline: offline)

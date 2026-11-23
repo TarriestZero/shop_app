@@ -31,6 +31,9 @@ void main() {
           RepositoryProvider(
             create: (context) => CatalogRepository(
               ProductsApiSource(context.read<Dio>()),
+              connectionChanges: context
+                  .read<NetworkConnectionService>()
+                  .watch(),
               cache: CatalogLocalDataSource(
                 context.read<SharedPreferencesService>(),
               ),

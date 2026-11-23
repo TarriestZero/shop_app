@@ -31,6 +31,7 @@ class AppTextField extends StatelessWidget {
   final TextInputAction textInputAction;
   final ValueChanged<String>? onFieldSubmitted;
   final FormFieldValidator<String>? validator;
+
   /// Позволяет читать isValid внутреннего поля без изменения текста ошибки.
   final GlobalKey<FormFieldState<String>>? formFieldKey;
 
@@ -38,7 +39,8 @@ class AppTextField extends StatelessWidget {
   final AutovalidateMode autovalidateMode;
 
   static final _email = RegExp(
-    r'^[^\s@.]+(?:\.[^\s@.]+)*@'
+    r"^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+"
+    r"(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
     r'(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$',
   );
 

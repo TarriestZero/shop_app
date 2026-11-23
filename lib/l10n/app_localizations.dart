@@ -388,6 +388,12 @@ abstract class AppLocalizations {
   /// **'Оформление заказа'**
   String get checkoutTitle;
 
+  /// No description provided for @checkoutNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для оформления заказа подключитесь к интернету.'**
+  String get checkoutNeedsConnection;
+
   /// No description provided for @checkoutName.
   ///
   /// In ru, this message translates to:

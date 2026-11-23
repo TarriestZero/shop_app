@@ -27,6 +27,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState>
   final int? _productId;
   late final StreamSubscription<List<CatalogProduct>> _subscription;
   Future<void>? _pendingLoad;
+  List<CatalogProduct>? _lastSnapshot;
 
   /// Читает память или кеш. При отсутствии снимка загружает полный каталог.
   @override
@@ -98,9 +99,16 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState>
 
   void _setProduct(List<CatalogProduct> products) {
     if (isClosed || _productId == null) return;
+    final current = state;
+    if (identical(products, _lastSnapshot) &&
+        current is ProductDetailsLoaded &&
+        current.isOffline == _repository.isOffline) {
+      return;
+    }
+    _lastSnapshot = products;
     for (final product in products) {
       if (product.id == _productId) {
-        emit(ProductDetailsLoaded(product));
+        emit(ProductDetailsLoaded(product, isOffline: _repository.isOffline));
         return;
       }
     }

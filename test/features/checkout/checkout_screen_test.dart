@@ -21,6 +21,106 @@ import '../../support/catalog_test_support.dart';
 import '../../support/network_test_support.dart';
 
 void main() {
+  testWidgets(
+    'Нет сети: форма сохраняется, кнопка и отправка с клавиатуры заблокированы',
+    (tester) async {
+      final connections = StreamController<bool>.broadcast();
+      addTearDown(connections.close);
+      final app = await _pumpCheckout(
+        tester,
+        connectionChanges: connections.stream,
+      );
+      connections.add(true);
+      await tester.pumpAndSettle();
+      await _fillValid(tester);
+      final oldSubmit = _submitButton(tester).onPressed!;
+
+      connections.add(false);
+      await tester.pumpAndSettle();
+      expect(_submitButton(tester).onPressed, isNull);
+      expect(
+        find.text('Для оформления заказа подключитесь к интернету.'),
+        findsOneWidget,
+      );
+      oldSubmit();
+      await tester.pumpAndSettle();
+      final address = find.byType(TextFormField).at(3);
+      await tester.ensureVisible(address);
+      await tester.tap(address);
+      await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(find.byType(OrderConfirmationScreen), findsNothing);
+      expect(app.cart.state.quantityFor(1), 2);
+      expect(app.preferences.writes, 1);
+      expect(
+        tester
+            .widgetList<AppTextField>(find.byType(AppTextField))
+            .map((field) => field.controller.text),
+        [
+          'Анна',
+          'anna@example.com',
+          '+7 (999) 123-45-67',
+          'Москва, ул. Мира, 10',
+        ],
+      );
+
+      connections.add(true);
+      await tester.pumpAndSettle();
+      expect(_submitButton(tester).onPressed, isNotNull);
+      expect(
+        find.text('Для оформления заказа подключитесь к интернету.'),
+        findsNothing,
+      );
+      final submit = find.widgetWithText(FilledButton, 'Оформить');
+      await tester.ensureVisible(submit);
+      await tester.tap(submit);
+      await tester.pumpAndSettle();
+      expect(find.byType(OrderConfirmationScreen), findsOneWidget);
+      expect(app.cart.state.items, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'Прямое открытие оформления без сети не позволяет создать заказ',
+    (tester) async {
+      final app = await _pumpCheckout(
+        tester,
+        connectionChanges: Stream.value(false),
+      );
+      await _fillValid(tester);
+      expect(_submitButton(tester).onPressed, isNull);
+      expect(
+        find.text('Для оформления заказа подключитесь к интернету.'),
+        findsOneWidget,
+      );
+      expect(app.cart.state.quantityFor(1), 2);
+    },
+  );
+
+  testWidgets('Некорректный email блокирует оформление до исправления', (
+    tester,
+  ) async {
+    final app = await _pumpCheckout(tester);
+    await _fillValid(tester);
+    expect(_submitButton(tester).onPressed, isNotNull);
+
+    await _enter(tester, 1, 'a,b@example.com');
+    expect(_submitButton(tester).onPressed, isNull);
+    final address = find.byType(TextFormField).at(3);
+    await tester.ensureVisible(address);
+    await tester.tap(address);
+    await tester.pump();
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.text('Введите корректный email'), findsOneWidget);
+    expect(find.byType(OrderConfirmationScreen), findsNothing);
+    expect(app.cart.state.quantityFor(1), 2);
+
+    await _enter(tester, 1, 'anna+order@example.com');
+    expect(_submitButton(tester).onPressed, isNotNull);
+  });
+
   testWidgets('Редактирование поля не показывает ошибки нетронутых полей', (
     tester,
   ) async {
@@ -252,6 +352,7 @@ _pumpCheckout(
   bool seed = true,
   String path = '/checkout',
   Size size = const Size(390, 844),
+  Stream<bool>? connectionChanges,
 }) async {
   await tester.binding.setSurfaceSize(size);
   final preferences = MemoryCartPreferences();
@@ -278,7 +379,7 @@ _pumpCheckout(
       providers: [
         RepositoryProvider<CatalogRepository>.value(value: repository),
         RepositoryProvider<NetworkConnectionService>.value(
-          value: TestNetworkConnectionService(),
+          value: TestNetworkConnectionService(connectionChanges),
         ),
       ],
       child: BlocProvider.value(

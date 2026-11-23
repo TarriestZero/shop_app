@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shop_app/core/exceptions/user_error_message.dart';
+import 'package:shop_app/core/network/network_connection_service.dart';
 import 'package:shop_app/features/cart/di/cart_notifier_bloc.dart';
+import 'package:shop_app/features/catalog/data/repositories/catalog_repository.dart';
+import 'package:shop_app/features/checkout/presentation/checkout/bloc/checkout_connection_cubit.dart';
 import 'package:shop_app/features/checkout/presentation/checkout/bloc/checkout_cubit.dart';
 import 'package:shop_app/l10n/app_localizations.dart';
 import 'package:shop_app/navigation/app_router.dart';
@@ -15,9 +18,17 @@ class CheckoutScreen extends StatefulWidget implements AutoRouteWrapper {
 
   @override
   Widget wrappedRoute(BuildContext context) => BlocProvider(
-    create: (context) =>
-        CheckoutCubit(clearCart: context.read<CartNotifierBloc>().clearCart),
-    child: this,
+    create: (context) => CheckoutConnectionCubit(
+      context.read<CatalogRepository>(),
+      connectionChanges: context.read<NetworkConnectionService>().watch(),
+    ),
+    child: BlocProvider(
+      create: (context) => CheckoutCubit(
+        clearCart: context.read<CartNotifierBloc>().clearCart,
+        hasConnection: () => context.read<CheckoutConnectionCubit>().state,
+      ),
+      child: this,
+    ),
   );
 
   @override
@@ -51,6 +62,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _submit() {
+    if (!context.read<CheckoutConnectionCubit>().state) return;
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid != _formValid) setState(() => _formValid = valid);
     if (!valid) return;
@@ -222,15 +234,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                             ],
                             const SizedBox(height: 24),
-                            AppButton(
-                              label: busy
-                                  ? strings.checkoutSubmitting
-                                  : strings.checkoutSubmit,
-                              isLoading: busy,
-                              onPressed:
-                                  _formValid && !busy && cart is! CartSaving
-                                  ? _submit
-                                  : null,
+                            BlocBuilder<CheckoutConnectionCubit, bool>(
+                              builder: (context, connected) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (!connected) ...[
+                                    Text(strings.checkoutNeedsConnection),
+                                    const SizedBox(height: 12),
+                                  ],
+                                  AppButton(
+                                    label: busy
+                                        ? strings.checkoutSubmitting
+                                        : strings.checkoutSubmit,
+                                    isLoading: busy,
+                                    onPressed:
+                                        _formValid &&
+                                            !busy &&
+                                            cart is! CartSaving &&
+                                            connected
+                                        ? _submit
+                                        : null,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),

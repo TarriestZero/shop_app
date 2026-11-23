@@ -331,6 +331,9 @@ NetworkException _connectionError() => const NetworkException.noConnection();
 
 class _Repository extends Fake implements CatalogRepository {
   @override
+  bool get isOffline => false;
+
+  @override
   Stream<List<CatalogProduct>> get changes => const Stream.empty();
 
   List<CatalogProduct>? cached;
